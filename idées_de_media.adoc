@@ -1,0 +1,36 @@
+= Idées de médias
+
+* Trade memory for cpu with memoization (java)
+* Spring-data-rest API versioning with projections (quicky)
+* Plantuml, the best friend of asciidoc : diagram-as-code
+* Easy concurrence with spring @Async
+* Validateable domain-classes for less complex business services
+* Jakarta EE boot as well as springboot
+* Almost no code for a restful WS with spring-data-rest
+* Micronaut boot better microservices than springboot
+* My favorite everyday-use IDE features (eclipse/intellij)
+* Dev, test, prod profiles should be natives in Springboot
+* Embrace the AOP world with the java annotation processor API
+* Breaking news : springboot n'est pas le seul framework java !
+* RAD is an old world for agile, but RAD java frameworks are rocketing the backlog
+* Il n'y a qu'un pas de springboot à Grails
+* Sdkman, la toolbox du mécanicien JVM
+* Switch case are just bad maps <= À reworder, trop "politiquement" orienté
+* Développer des tests intuitifs et concis sur toute la pyramide avec Spock
+* Multi module projects for elegant monoliths (java)
+* Groovy 3, all the operators, all the data structures, all the utils
+
+== Idées sélectionnées
+
+* [ article ] Groovy 3, all the operators, all the data structures, all the utils
+* [ video ] Sdkman, la toolbox du mécanicien JVM
+* [ video ] Plantuml, the best friend of asciidoc : diagram-as-code
+* [ article ] Mon top 10 des nouveautés de Java 17 depuis Java 11 (livre blanc ?)
+
+== Jeudi 28/10/2021
+
+Sujet sélectionné :
+
+* [ video ] Plantuml, the best friend of asciidoc : diagram-as-code
+* [ article ] Groovy 3, all the operators, all the data structures, all the utils
+
