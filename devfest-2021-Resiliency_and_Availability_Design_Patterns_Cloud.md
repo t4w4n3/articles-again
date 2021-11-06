@@ -18,7 +18,7 @@ Elle est atteinte par l'association de plusieurs techniques :
 
 ## La disponibilité géographique
 
-Cela consiste à répartir les nœuds d'un cluster sur des plusieurs datacenters espacés géographiquement, et qui sont chacun sensibles à des types de pannes différentes.
+Cela consiste à répartir les nœuds d'un cluster sur plusieurs datacenters espacés géographiquement, et qui sont chacun sensibles à des types de pannes différentes.
 
 Une gestion d'état de ces datacenter permet de switcher automatiquement sur ceux en bonne santé.
 
