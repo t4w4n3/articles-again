@@ -24,5 +24,8 @@ Une gestion d'état de ces datacenter permet de switcher automatiquement sur ceu
 
 ## L'auto-scaling
 
-C'est le fait de démarrer de nouveaux noeuds  
+C'est le fait de démarrer automatiquement de nouveaux noeuds lorsque la charge augmente.
 
+C’est un scaling horizontal.
+
+## wip
