@@ -8,13 +8,13 @@
 
 Les systèmes distribués sont difficiles.
 
-De là, admettons un fait : ça va tomber en panne.
+De là, admettons un fait : "ça" va tomber en panne.
 
 Anticipons donc la "failure" dans le dev de nos applis.
 
 On appelle cela la résilience.
 
-Elle est atteinte par l'association de plusieurs techniques, que Sébastien présente alors.
+Elle est atteinte par l'association de plusieurs techniques, que voici.
 
 ## I. La disponibilité géographique
 
@@ -28,4 +28,10 @@ C'est le fait de démarrer automatiquement de nouveaux noeuds lorsque la charge 
 
 C’est un scaling horizontal.
 
-## III. wip
+On le distingue du scaling vertical, où on se contente d'augmenter les performances des serveurs hôtes.
+
+## III. Decoupling and asynchronisme
+
+"Découpler" (instaurer un couplage faible) permet de rendre le système modulaire : on peut en remplacer/modifier un module sans devoir toucher aux autres.
+
+C'est le S de SOLID : Single Responsability Principle
