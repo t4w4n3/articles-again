@@ -34,4 +34,14 @@ On le distingue du scaling vertical, où on se contente d'augmenter les performa
 
 "Découpler" (instaurer un couplage faible) permet de rendre le système modulaire : on peut en remplacer/modifier un module sans devoir toucher aux autres.
 
-C'est le S de SOLID : Single Responsability Principle
+C'est le S de SOLID : Single Responsability Principle.
+
+On peut découpler 2 applications RESTFUL synchrones on les désynchronisant.
+
+### Fonctionnement synchrone
+
+```puml
+@startuml
+a->b: test
+@enduml
+```
