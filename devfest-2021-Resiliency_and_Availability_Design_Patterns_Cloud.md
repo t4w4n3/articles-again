@@ -42,6 +42,22 @@ On peut découpler 2 applications RESTFUL synchrones on les désynchronisant.
 
 ```puml
 @startuml
-a->b: test
+InvoiceApp -> PaymentApp: /search/invoice/123
+activate PaymentApp
+InvoiceApp <-- PaymentApp: {"id": 123, "amount": 38.98}
+deactivete PaymentApp
+InvoiceApp -> Invoice App: doSomeStuffWithThePayment()
+@enduml
+```
+
+### Fonctionnement asynchrone
+
+```puml
+@startuml
+InvoiceApp --> PaymentQueue: need payment 123
+PaymentQueue --> PaymentApp: invoiceApp need payment 123
+PaymentApp --> PaymentQueue: {"id": 123, "amount": 38.98}
+PaymentQueue --> InvoiceApp: {"id": 123, "amount": 38.98}
+InvoiceApp -> Invoice App: doSomeStuffWithThePayment()
 @enduml
 ```
