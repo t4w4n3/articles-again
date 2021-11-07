@@ -83,3 +83,14 @@ database replicat 2 read-only
 On peut à présent :
 * dégrader les services en read-only (plutôt que de fermer totalement)
 * Scaler horizontalement les bases
+
+### Database sharding
+
+Une autre option de résilience et de scaling de database est le sharding, qui consiste à répartir les data sur plusieurs databases. 
+
+Par exemple :
+* ids 1 à 10 -> le shard 1
+* ids 11 à 20 -> le shard 2
+* ...
+
+## Timout, Backoff, Retries
