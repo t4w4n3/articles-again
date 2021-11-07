@@ -61,3 +61,11 @@ PaymentQueue --> InvoiceApp: {"id": 123, "amount": 38.98}
 InvoiceApp -> Invoice App: doSomeStuffWithThePayment()
 @enduml
 ```
+
+Ainsi, les 2 applications sont découplées, elles fonctionnent indépendament à l'aide de queues et d'interfaces json (openApi et/ou asyncApi).
+
+Si l'une d'elle à une défaillance, la queue se remplira toujours, et sera consommées lors du retour à la normale.
+
+On affectera alors des priorités aux queues afin de choisir précisément quels services on souhaite dégrader en cas de défaillance.
+
+## Databases
