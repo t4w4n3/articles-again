@@ -64,8 +64,22 @@ InvoiceApp -> Invoice App: doSomeStuffWithThePayment()
 
 Ainsi, les 2 applications sont découplées, elles fonctionnent indépendament à l'aide de queues et d'interfaces json (openApi et/ou asyncApi).
 
-Si l'une d'elle à une défaillance, la queue se remplira toujours, et sera consommées lors du retour à la normale.
+Si l'une d'elle à une défaillance, la queue se remplira toujours, et sera consommée lors du retour à la normale.
 
 On affectera alors des priorités aux queues afin de choisir précisément quels services on souhaite dégrader en cas de défaillance.
 
 ## Databases
+
+Et si on séparait les responsabilité read/write ?
+
+```puml
+@startuml
+database master \n read/write
+database replicat 1 read-only
+database replicat 2 read-only
+@enduml
+```
+
+On peut à présent :
+* dégrader les services en read-only (plutôt que de fermer totalement)
+* Scaler horizontalement les bases
