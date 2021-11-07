@@ -94,3 +94,21 @@ Par exemple :
 * ...
 
 ## Timout, Backoff, Retries
+
+La quasi totalité de nos outils ont des valeurs de timeout par défaut, parfois (souvent) élevées.
+
+Exemple : un HTTP GET sans réponse depuis 4 secondes, et qui attendra en tout 10 secondes avant d'arrêter son attente et de remonter une exception technique.
+
+Dans un flux métier complexe où plusieurs appels http se succèdent, la somme des timeout au bout de ce flux est conséquente.
+
+On peut alors avoir des boards de supervision, la panne mettra (trop ?) longtemps à y apparaitre.
+
+De plus, dans le cas d'une forte volumétrie d'appels, une application qui cesse de répondre va mettre en attente une quantité d'appels si importante que le nombre de connexion max sera atteints, et boum -> tout tombe.
+
+On préfère là aussi une dégradation de service à un arrêt total.
+
+La solution : abaisser fortement les temps de timeout ! Probablement < 1 seconde
+
+Les latences réseaux inévitables vont alors faire échouer quelques requetes, qui auraient pu passer à la 1003ème ms.
+
+On résout ce problème-ci avec des retries (ré-essaies)
