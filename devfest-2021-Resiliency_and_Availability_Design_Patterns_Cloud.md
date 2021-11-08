@@ -12,7 +12,7 @@
   - [Intro](#intro)
   - [I. La disponibilité géographique](#i-la-disponibilit-gographique)
   - [II. L'auto-scaling](#ii-lauto-scaling)
-  - [III. Le Decoupling and asynchronisme](#iii-le-decoupling-and-asynchronisme)
+  - [III. Le Decoupling et l'asynchronisme](#iii-le-decoupling-et-lasynchronisme)
     - [1.) Fonctionnement synchrone](#1-fonctionnement-synchrone)
     - [2.) Fonctionnement asynchrone](#2-fonctionnement-asynchrone)
   - [IV. Databases](#iv-databases)
@@ -52,7 +52,7 @@ C’est un scaling horizontal.
 
 On le distingue du scaling vertical, où on se contente d'augmenter les performances des serveurs hôtes.
 
-## III. Le Decoupling and asynchronisme
+## III. Le Decoupling et l'asynchronisme
 
 "Découpler" (instaurer un couplage faible) permet de rendre le système modulaire : on peut en remplacer/modifier un module sans devoir toucher aux autres.
 
