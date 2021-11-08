@@ -62,31 +62,12 @@ On peut découpler 2 applications RESTFUL synchrones on les désynchronisant.
 
 ### 1.) Fonctionnement synchrone
 
-```puml
-@startuml
-InvoiceApp -> PaymentApp: /search/invoice/123
-activate PaymentApp
-InvoiceApp <-- PaymentApp: {"id": 123, "amount": 38.98}
-deactivate PaymentApp
-InvoiceApp -> InvoiceApp: doSomeStuffWithThePayment()
-@enduml
-```
+<img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuVBCAylFJ4vrB2XGqBLJ24Yip4tDAm7oh1JqYrCJYv8pz3CXAlGDZOov4fDBCiiIIrAH52AROAEhYs94jL9cYfAL0b2dZe9IOcv-QLu9a6jieMTfKSkLaehBD8Hx43mhXPJyuFpSrE2IqhIqyCoIZ92CLAWs3KqkXzIy5A1l0000">
+
 
 ### 2.) Fonctionnement asynchrone
 
-```puml
-@startuml
-InvoiceApp --> InvoiceQueue: need payment 123
-PaymentApp <-- InvoiceQueue: invoiceApp need payment 123
-activate PaymentApp
-PaymentApp --> PaymentQueue: {"id": 123, "amount": 38.98}
-deactivate PaymentApp
-PaymentQueue --> InvoiceApp: {"id": 123, "amount": 38.98}
-activate InvoiceApp
-InvoiceApp -> InvoiceApp: doSomeStuffWithThePayment()
-deactivate InvoiceApp
-@enduml
-```
+<img src="http://www.plantuml.com/plantuml/png/VP0n2y8m48Nt_egZau8Hj4ij8dLqKoeuX-PA0oOfUYc8-DzDC91GnIsFtFlktQlln6zarJKxwD785lV308pj8CYJHOiLQ4G10tyer0IhTP4TFsy_lMLiCYqZwil8Mv8Z9uH8I65-TP01ziobo2llNK3EbR6Qd2pAvQPyPG9_yo8WFSRz_UV5TD6H5ZD12TCOXGtPhhj8wiyzXispUP8iPTMeXIlx3G00">
 
 Ainsi, les 2 applications sont découplées, elles fonctionnent indépendamment à l'aide de queues et d'interfaces json (openApi et/ou asyncApi).
 
@@ -98,13 +79,7 @@ On affectera alors des priorités aux queues afin de choisir précisément quels
 
 Et si on séparait les responsabilité read/write ?
 
-```puml
-@startuml
-database ""master\nread/write""
-database "replicat 1\nread-only"
-database "replicat 2\nread-only"
-@enduml
-```
+<img src="http://www.plantuml.com/plantuml/png/SoWkIImgAStDuKf9B4bCIYnELL1IoaqiBaajYiahIarCqIyloYn9LL92aYzABSZ9J4uiKJ24AD7DpykfnAh024M1GsfU2j0c0000">
 
 On peut à présent :
 * dégrader les services en read-only (plutôt que de fermer totalement)
@@ -171,28 +146,7 @@ Ce concept-là consiste à réagir à une failure en mettant en file d'attente l
 
 Dans un cluster load balancé, on assigne 2 à 3 nœuds par client, de manière que la chute d'un unique noeuds ne fasse tomber aucun client.
 
-```puml
-@startuml
-actor A
-actor B
-actor C
-
-node 1
-node 2
-node 3
-node 4
-
-A -> 1
-A -> 2
-B -> 3  
-B -> 4
-C -> 2  
-C -> 3
-D -> 1  
-D -> 4  
-@enduml
-```
-
+<img src="http://www.plantuml.com/plantuml/png/BSsx3O0W64NX_avn5x3WKHiUBaA4JY51t5_9J_MTxhXdf3xU-q8wH-lqox2CG6svK0bQC885FBUTIj084qDAMCI99YKCZeaY9Im9Lsh-xny0">
 
 ## X. Pour finir
 
