@@ -144,7 +144,7 @@ Ce concept-là consiste à réagir à une failure en mettant en file d'attente l
 
 ## IX. Sharding
 
-Dans un cluster load balancé, on assigne 2 à 3 nœuds par client, de manière que la chute d'un unique noeuds ne fasse tomber aucun client.
+Dans un cluster load balancé, on assigne 2 à 3 nœuds par client, de manière que la chute d'un unique noeud ne fasse tomber aucun client.
 
 <img src="http://www.plantuml.com/plantuml/png/BSsx3O0W64NX_avn5x3WKHiUBaA4JY51t5_9J_MTxhXdf3xU-q8wH-lqox2CG6svK0bQC885FBUTIj084qDAMCI99YKCZeaY9Im9Lsh-xny0">
 
