@@ -1,3 +1,19 @@
+-----
+
+À qui je m'adresse : 
+* Les développeurs Java qui ne connaissent pas du tout Groovy
+* Les développeurs Java qui connaissent un peu Groovy (ex : Jenkins), mais n'ont jamais essayé/envisagé de l'utiliser en prod
+* Les développeurs d'autres langages qui ont besoin d'un langage de script
+
+C'est quoi l'objectif de l'article :
+1. Convaincre que Groovy permet de coder vite (et plus vite qu'en Java)
+2. Convaincre qu'on peut utiliser Groovy en production
+3. Convaincre qu'on peut ajouter Groovy dans un projet existant facilement et sans risque (interopérabilité/compatibilité avec Java)
+4. Convaincre que le langage est intuitif et facile à apprendre
+5. Donner envie de proposer Groovy à sa team demain matin
+
+-----
+
 # Groovy (3), le langage JVM orienté productivité
 
 ## I. Intro
