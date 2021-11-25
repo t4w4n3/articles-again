@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="07495f5a-ed32-470c-9665-ee2f8bf9f3a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Groovy-3.adoc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/meetup-spring-data-rest.adoc" beforeDir="false" afterPath="$PROJECT_DIR$/meetup-spring-data-rest.adoc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/Bootstrap.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/Bootstrap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/SpringRepositoryRestConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/SpringRepositoryRestConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/library/adapter/in/web/LivreRestRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/librairie/adapter/in/web/LivreRestRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/library/adapter/out/persistence/Livre.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/librairie/adapter/out/persistence/Livre.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/library/application/port/in/LivreDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/librairie/application/port/out/LivreDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/library/domain/Author.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/librairie/domain/Author.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/library/domain/Livre.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/librairie/domain/Livre.java" afterDir="false" />
-    </list>
+    <list default="true" id="07495f5a-ed32-470c-9665-ee2f8bf9f3a9" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -96,7 +85,7 @@
       <workItem from="1635687385313" duration="2288000" />
       <workItem from="1637828734296" duration="5041000" />
       <workItem from="1637834457195" duration="2755000" />
-      <workItem from="1637849322919" duration="2680000" />
+      <workItem from="1637849322919" duration="2990000" />
     </task>
     <task id="LOCAL-00001" summary="fix: typo">
       <created>1635436461309</created>
