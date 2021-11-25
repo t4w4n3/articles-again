@@ -1,9 +1,38 @@
 # Groovy (3), le langage JVM orienté productivité
 
+## I. Intro
+
+Dans les projets logiciels itératifs, incrémentaux et adaptatifs, et dans un monde où on veut réagir rapidement au
+changement, on veut coder VITE, ne pas réinventer la roue (et encore moins la roue carrée).
+
+Une lib existe pour faire ce qu’on a besoin ? Elle est stable, maintenue, ses edge case sont testés ? Ok on l’embarque
+plutôt que de recoder la feature.
+
+Dans le monde Java, on a bien des frameworks et des lib à foison remplis d’utils, de helpers, et d’annotations :
+
+- Springboot
+- Lombok
+- Micronaut
+- Apache commons
+- Guava
+
+Et j’en passe.
+
+Mais on a aussi des langages !
+
+- Kotlin
+- Scala Et …
+- **Groovy**
+
+Après l’avoir utilisé dans mes stack de test, je l’ai utilisé pendant presque 2 ans en production ; je n’avais jamais
+utilisé un transcodage pensées → code aussi efficace.
+
+Cet article présente les features de Groovy (3.0.9) pour coder ses idées à toute vitesse.
+
+
 ## Table of Contents
 
 - [Groovy (3), le langage JVM orienté productivité](#groovy-3-le-langage-jvm-orient-productivit)
-    - [I. Intro](#i-intro)
     - [II. Les facettes de Groovy](#ii-les-facettes-de-groovy)
 	- [1.) Une courbe d’apprentissage plate](#1-une-courbe-dapprentissage-plate)
 	- [2.) Convention-over-configuration](#2-convention-over-configuration)
@@ -36,35 +65,6 @@
 	- [3.) Micronaut](#3-micronaut)
 	- [4.) Gradle](#4-gradle)
     - [V. Notre prod n’est pas prête pour Groovy, mais notre stack de test l’est, comment faire ?](#v-notre-prod-nest-pas-prte-pour-groovy-mais-notre-stack-de-test-lest-comment-faire-)
-
-## I. Intro
-
-Dans les projets logiciels itératifs, incrémentaux et adaptatifs, et dans un monde où on veut réagir rapidement au
-changement, on veut coder VITE, ne pas réinventer la roue (et encore moins la roue carrée).
-
-Une lib existe pour faire ce qu’on a besoin ? Elle est stable, maintenue, ses edge case sont testés ? Ok on l’embarque
-plutôt que de recoder la feature.
-
-Dans le monde Java, on a bien des frameworks et des lib à foison remplis d’utils, de helpers, et d’annotations :
-
-- Springboot
-- Lombok
-- Micronaut
-- Apache commons
-- Guava
-
-Et j’en passe.
-
-Mais on a aussi des langages !
-
-- Kotlin
-- Scala Et …
-- **Groovy**
-
-Après l’avoir utilisé dans mes stack de test, je l’ai utilisé pendant presque 2 ans en production ; je n’avais jamais
-utilisé un transcodage pensées → code aussi efficace.
-
-Cet article présente les features de Groovy (3.0.9) pour coder ses idées à toute vitesse.
 
 ## II. Les facettes de Groovy
 
