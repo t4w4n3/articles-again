@@ -1,4 +1,4 @@
-package fr.younup.crudnocode.library.domain;
+package fr.younup.crudnocode.librairie.domain;
 
 public record Livre(String titre, Author author) {
 }

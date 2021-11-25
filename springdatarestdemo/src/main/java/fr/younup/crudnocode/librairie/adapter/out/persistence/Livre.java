@@ -1,4 +1,4 @@
-package fr.younup.crudnocode.library.adapter.out.persistence;
+package fr.younup.crudnocode.librairie.adapter.out.persistence;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

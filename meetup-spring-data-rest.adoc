@@ -1,8 +1,82 @@
 = Meetup Spring data rest
+Antoine Salesse - t4w4n3 - <a.salesse@younup.fr>
+:toc:
+:toclevels: 3
 
 Buildons un  crud restful avec seulement des interfaces, des annotations et de la conf.
 
 == Table of contents
 
+=== Intro
 
+Aujourd'hui on fait des backend qui exposent par api rest des services de logique métier complexe.
+Mais parfois, on a besoin d'un simple crud.
+Crud restful bien entendu, et surtout avec les PATCH qui vont bien (json-patch, merge-patch).
 
+S'il y a bien une technique maitrisée et éprouvée, c'est le crud. Alors ne nous fatiguons pas à le réinventer, et servons-nous des repositories de spring-data-rest !
+
+=== Un CRUD qu'est-ce que c'est ?
+
+==== types de cruds
+
+==== crud restful
+
+==== le plus dur dans le cru restful : les patch
+
+* json-patch
+* merge-patch
+
+=== Une app springboot simple
+
+Présenter les dépendances :
+* h2
+* data-jpa
+* data-rest
+
+==== Archi de l'app initial
+
+Le business : des livres
+
+Un unique bounded context : Les livres vues par la librairie
+
+Archi port/adapter :
+
+* Un model métier
+* un dossier pour les adapters input (controllers et listeners)
+* des ports output (les interfaces des dto exposés)
+* un modèle de persistence
+* un dossier de services (les use-cases métiers)
+* Un bootstrap pour initialiser la bdd
+
+En profiter pour rappeler ce que veut dire bootstrap (autoporté).
+
+=== Notre crud : exposer les livres (read/write)
+
+Contrainte : exposer les livres, sans exposer le modèle de persistence.
+
+=== Montrer qu'avec un RestController, tout est à coder
+
+=== Supprimer le restController, et créer un CrudRepository
+
+Expliquer aussi ce qu'est un repository au sens DDD.
+Montrer que cette définition est dans le code source de la classe Repository de Spring.
+
+=== Ajouter l'annotation RepositoryRestResource
+
+=== Démarrer et tester le get avec un swagger ui
+
+=== Préciser qu'on ne veut pas exposer l'entité, mais le dto
+
+=== Ajouter la projection et montrer le résultat avec
+
+=== Configurer la projection par défaut
+
+=== Montrer le post : ça marche pas : normal, il faut un mapper projection -> entité
+
+=== Créer le mapper
+
+=== Montrer le post, le put, le delete et les 2 patch qui marchent.
+
+=== Montrer qu'on peut ajouter des endpoint pour complexifier notre crud en une api métier.
+
+=== Conclusion : Montrer qu'on a effectivement pas écrit de code, il n'y a que de la conf, des interfaces et des annotations.

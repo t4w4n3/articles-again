@@ -1,4 +1,4 @@
-package fr.younup.crudnocode.library.application.port.in;
+package fr.younup.crudnocode.librairie.application.port.out;
 
 public interface LivreDto {
 	default String getTitre(){
