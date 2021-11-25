@@ -1,0 +1,27 @@
+= Idées de meetup java
+
+* Spring-data-rest API versioning with projections (quicky)
+* Easy concurrence with spring @Async
+* Validateable domain-classes for less complex business services
+* Jakarta EE boot as well as springboot
+* Almost no code for a restful crud with spring-data-rest
+* Dev, test, prod profiles could be natives in Springboot
+* Multi module projects for elegant monoliths (java)
+* Mon top 10 des nouveautés de Java 17 depuis Java 11 (livre blanc ?)
+
+== jeudi 25/11/2021
+
+=== pré-selection avec Pierre et Florian
+
+* Almost no code for a restful crud with spring-data-rest (quicky)
+* Multi module projects for elegant java monoliths
+* Dev, test, prod profiles could be natives in Springboot
+* Easy concurrence with spring @Async
+
+=== Sujet choisi
+
+Almost no code for a restful crud with spring-data-rest (quicky)
+
+=== Phase de recherche
+
+* Démarrage d'un projet spring boot avec spring data rest

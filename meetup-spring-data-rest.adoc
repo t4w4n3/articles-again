@@ -1,0 +1,8 @@
+= Meetup Spring data rest
+
+Buildons un  crud restful avec seulement des interfaces, des annotations et de la conf.
+
+== Table of contents
+
+
+
