@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="07495f5a-ed32-470c-9665-ee2f8bf9f3a9" name="Changes" comment="" />
+    <list default="true" id="07495f5a-ed32-470c-9665-ee2f8bf9f3a9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/springdatarestdemo/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/Bootstrap.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/Bootstrap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/SpringRepositoryRestConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/SpringRepositoryRestConfiguration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/librairie/adapter/in/web/LivreRestRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/librairie/application/port/in/LivreRestRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/librairie/application/port/out/LivreDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/springdatarestdemo/src/main/java/fr/younup/crudnocode/librairie/application/port/out/LivreDto.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -86,6 +93,7 @@
       <workItem from="1637828734296" duration="5041000" />
       <workItem from="1637834457195" duration="2755000" />
       <workItem from="1637849322919" duration="2990000" />
+      <workItem from="1638024015965" duration="994000" />
     </task>
     <task id="LOCAL-00001" summary="fix: typo">
       <created>1635436461309</created>

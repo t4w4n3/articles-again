@@ -1,6 +1,6 @@
 package fr.younup.crudnocode;
 
-import fr.younup.crudnocode.librairie.adapter.in.web.LivreRestRepository;
+import fr.younup.crudnocode.librairie.application.port.in.LivreRestRepository;
 import fr.younup.crudnocode.librairie.adapter.out.persistence.Livre;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
