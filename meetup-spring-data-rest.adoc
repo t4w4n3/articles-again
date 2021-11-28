@@ -5,6 +5,8 @@ Antoine Salesse - t4w4n3 - <a.salesse@younup.fr>
 
 Buildons un  crud restful avec seulement des interfaces, des annotations et de la conf.
 
+// Pour avoir des example concrets en terme de compléxité métier, on va utiliser le code kata d'une api de commande de pizza.
+
 == Table of contents
 
 === Intro
