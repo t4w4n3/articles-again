@@ -18,32 +18,32 @@ C'est quoi l'objectif de l'article :
 
 ## I. Intro
 
+"Développeur/euse Java" ça ne serait pas un peu réducteur en fait ?
+
+Ce n'est pas du Java qui tourne sur nos serveurs, nos smartphones !
+
+Et non, c'est bien du bytecode. On peut le générer avec plusieurs langages :
+
+* Java (no kidding)
+* Groovy
+* Scala
+* Kotlin
+* Clojure
+* JRuby
+* Jython
+
+Le bytecode généré est inter-compatible quel que soit son langage d'origine.
+
+Cela signifie qu'une application peut avoir des classes en .java, .kt, .groovy. .scala, elles peuvent toutes s'utiliser entre elles.
+
+On retrouve souvent ces langages parallèles dans des outils liés au test, à la conf et à l'automatisation :
+
+* Groovy dans Soap UI, Spock, Jenkins, Gradle, Geb
+* Scala dans Gatling
+
+Et on peut parfaitement les utiliser dans du code de production, ce que j'ai fait pendant presque 2 ans par le biais du framework Grails (Groovy On Rails). Je n’avais jamais utilisé un transcodage pensé vers code aussi efficace.
+
 Cet article présente les features de Groovy (3.0.9) pour coder ses idées à toute vitesse.
-
-Dans les projets logiciels itératifs, incrémentaux et adaptatifs, et dans un monde où on veut réagir rapidement au
-changement, on veut coder vite, ne pas réinventer la roue (et encore moins la roue carrée).
-
-Une lib existe pour faire ce qu’on a besoin ? Elle est stable, maintenue, ses Edge cases sont testés ? Ok on l’embarque
-plutôt que de recoder la feature.
-
-Dans le monde Java, on a bien des frameworks et des lib à foison remplis d’utils, de helpers, et d’annotations :
-
-- Springboot
-- Lombok
-- Micronaut
-- Apache commons
-- Guava
-
-Et j’en passe.
-
-Mais on a aussi des langages !
-
-- Kotlin
-- Scala Et …
-- **Groovy**
-
-Après l’avoir utilisé dans mes stack de test, je l’ai utilisé pendant presque 2 ans en production ; je n’avais jamais
-utilisé un transcodage pensé vers code aussi efficace.
 
 ## Table of Contents
 
