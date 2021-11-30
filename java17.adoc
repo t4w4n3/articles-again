@@ -1,16 +1,16 @@
-= Java 17, plus qu'une LTS, une milestone du record & pattern matching
+= Java 17, plus qu’une LTS, une milestone du record & pattern matching
 Antoine Saqlesse - a.salesse@younup.fr
 :toc:
 
 == Intro
 
-Promis juré, cet article n'est pas une liste de https://docs.oracle.com/javase/specs/jls/se17/html/index.html[JLS]footnote:[JLS : Java Language Specification] / JSRfootnote:[JSR : Java Specification Request] / JEPfootnote:[JEP : JDK Enhancement Proposal].
+Promis juré, cet article n’est pas une liste de https://docs.oracle.com/javase/specs/jls/se17/html/index.html[JLS]footnote:[JLS : Java Language Specification] / JSRfootnote:[JSR : Java Specification Request] / JEPfootnote:[JEP : JDK Enhancement Proposal].
 
 Depuis le xxx, les articles Java 17 pleuvent.
 
 Ça y est, on a bien compris que cette version est une LTSfootnote:[LTS : Long Term Support].
 
-Mais c'est aussi bien plus que cela. C'est une milestone de l'objectif ambitieux de pouvoir utiliser le pattern matching dans :
+Mais c’est aussi bien plus que cela. C’est une milestone de l’objectif ambitieux de pouvoir utiliser le pattern matching dans :
 
 * les `instanceof`
 * les `switch`
@@ -19,15 +19,15 @@ Mais c'est aussi bien plus que cela. C'est une milestone de l'objectif ambitieux
 * des `match`
 * des structures
 
-C'est donc de ça qu'on parle ici :
+C’est donc de ça qu’on parle ici :
 
-* Qu'est ce que le pattern matching ?
+* Qu’est ce que le pattern matching ?
 * À quoi ça sert ?
-* Qu'est ce que ça va apporter à notre code ?
+* Qu’est ce que ça va apporter à notre code ?
 
 Et avec bien sûr des exemples de code !
 
-== Qu'est ce que le pattern matching ?
+== Qu’est ce que le pattern matching ?
 
 == À quoi ça sert ?
 
@@ -41,12 +41,12 @@ Et avec bien sûr des exemples de code !
 * Qualifying beans before request scoped injection
 * Strategy pattern
 
-== Qu'est ce que ça va apporter à notre code ?
+== Qu’est ce que ça va apporter à notre code ?
 
 Plus de validation à la compile-time, et donc :
 
 * plus de sécurité
-* développer plus intuitivement (le compilateur nous dis ce qu'on a oublié)
+* développer plus intuitivement (le compilateur nous dis ce qu’on a oublié)
 * faire émerger de meilleurs designs
 
 == Conclusion
