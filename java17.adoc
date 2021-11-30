@@ -29,9 +29,13 @@ Et avec bien sûr des exemples de code !
 
 == Qu’est ce que le pattern matching ?
 
-== À quoi ça sert ?
+=== À quoi ça sert ?
 
-=== Faire varier des comportements à la runtime
+=== Dans quels langages on en trouve déjà
+
+* https://docs.scala-lang.org/tour/pattern-matching.html[Scala]
+
+== Faire varier des comportements à la runtime
 
 === Exemples de variation de comportement
 
@@ -40,6 +44,7 @@ Et avec bien sûr des exemples de code !
 * Spring FactoryBean
 * Qualifying beans before request scoped injection
 * Strategy pattern
+* programmation fonctionnelle (mettre une Function en argument d'une méthode)
 
 == Qu’est ce que ça va apporter à notre code ?
 
