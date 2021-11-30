@@ -33,7 +33,7 @@ Et avec bien sûr des exemples de code !
 
 === Faire varier des comportements à la runtime
 
-=== Exemples de méthodes de comportement
+=== Exemples de variation de comportement
 
 * if this, then do something, else do something else
 * switch case
