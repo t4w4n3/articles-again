@@ -10,7 +10,8 @@ Depuis le xxx, les articles Java 17 pleuvent.
 
 Ça y est, on a bien compris que cette version est une LTSfootnote:[LTS : Long Term Support].
 
-Mais c'est aussi bien plus que cela. C'est une milestone de l'objectif ambitieux de pouvoir utiliser le pattern matching dans  :
+Mais c'est aussi bien plus que cela. C'est une milestone de l'objectif ambitieux de pouvoir utiliser le pattern matching dans :
+
 * les `instanceof`
 * les `switch`
 * des déconstruction de record
@@ -19,6 +20,7 @@ Mais c'est aussi bien plus que cela. C'est une milestone de l'objectif ambitieux
 * des structures
 
 C'est donc de ça qu'on parle ici :
+
 * Qu'est ce que le pattern matching ?
 * À quoi ça sert ?
 * Qu'est ce que ça va apporter à notre code ?
@@ -42,6 +44,7 @@ Et avec bien sûr des exemples de code !
 == Qu'est ce que ça va apporter à notre code ?
 
 Plus de validation à la compile-time, et donc :
+
 * plus de sécurité
 * développer plus intuitivement (le compilateur nous dis ce qu'on a oublié)
 * faire émerger de meilleurs designs
