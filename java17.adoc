@@ -14,20 +14,27 @@ Mais c’est aussi bien plus que cela. C’est une milestone de l’objectif amb
 
 * les `instanceof`
 * les `switch`
-* des déconstruction de record
-* des déconstruction de tableaux
+* des déconstructions de record
+* des déconstructions de tableaux
 * des `match`
 * des structures
 
 C’est donc de ça qu’on parle ici :
 
-* Qu’est ce que le pattern matching ?
+* Qu’est-ce que le pattern matching ?
 * À quoi ça sert ?
-* Qu’est ce que ça va apporter à notre code ?
+* Qu’est-ce que ça va apporter à notre code ?
 
 Et avec bien sûr des exemples de code !
 
-== Qu’est ce que le pattern matching ?
+== Qu’est-ce que le pattern matching ?
+
+Je pense qu'on ne peut pas couper à la définition de Wikipédia :
+
+[quote, https://en.wikipedia.org/wiki/Pattern_matching]
+--
+In computer science, pattern matching is the act of checking a given sequence of tokens for the presence of the constituents of some pattern
+--
 
 === À quoi ça sert ?
 
@@ -44,18 +51,21 @@ Et avec bien sûr des exemples de code !
 * Spring FactoryBean
 * Qualifying beans before request scoped injection
 * Strategy pattern
-* programmation fonctionnelle (mettre une Function en argument d'une méthode)
+* Programmation fonctionnelle (mettre une Function en argument d'une méthode)
 
-== Qu’est ce que ça va apporter à notre code ?
+== Qu’est-ce que ça va apporter à notre code ?
 
 Plus de validation à la compile-time, et donc :
 
-* plus de sécurité
-* développer plus intuitivement (le compilateur nous dis ce qu’on a oublié)
-* faire émerger de meilleurs designs
+* Plus de sécurité
+* Développer plus intuitivement (le compilateur nous dis ce qu’on a oublié)
+* Faire émerger de meilleurs designs
 
 == Conclusion
 
+// brainstorm area
+// * Pattern guards
+// * Sealed classes
 
 
 
