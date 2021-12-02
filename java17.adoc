@@ -1,29 +1,28 @@
 = Java 17, plus qu’une LTS, une milestone du record & pattern matching
-Antoine Saqlesse - a.salesse@younup.fr
+Antoine Salesse - a.salesse@younup.fr
 :toc:
 
 == Intro
 
 Promis juré, cet article n’est pas une liste de https://docs.oracle.com/javase/specs/jls/se17/html/index.html[JLS]footnote:[JLS : Java Language Specification] / JSRfootnote:[JSR : Java Specification Request] / JEPfootnote:[JEP : JDK Enhancement Proposal].
 
-Depuis le xxx, les articles Java 17 pleuvent.
+Depuis sa sortie en septembre 2021, les articles sur Java 17 pleuvent.
 
 Ça y est, on a bien compris que cette version est une LTSfootnote:[LTS : Long Term Support].
 
-Mais c’est aussi bien plus que cela. C’est une milestone de l’objectif ambitieux de pouvoir utiliser le pattern matching dans :
+Mais c’est aussi bien plus que cela. C’est une milestone de l’objectif ambitieux nommé "Record and Array Pattern Matching".
+Cet objectif est un ensemble de fonctionnalités synergiques :
 
-* les `instanceof`
-* les `switch`
-* des déconstructions de record
-* des déconstructions de tableaux
-* des `match`
-* des structures
+* Les `instanceof` avec "Type Patterns"
+* La déconstruction de `record` (Peut-être Java 18 preview)
+* La déconstruction d'array (Java 18+ ?)
+* Les Switch on Patterns (Java 17 preview, et probablement dispo en 19)
+* Les imbrications de patterns
 
-C’est donc de ça qu’on parle ici :
+C’est donc de ces features dont on parle ici :
 
-* Qu’est-ce que le pattern matching ?
-* À quoi ça sert ?
-* Qu’est-ce que ça va apporter à notre code ?
+* À quoi elles servent ?
+* Que vont-elles apporter à notre code ?
 
 Et avec bien sûr des exemples de code !
 
@@ -33,25 +32,89 @@ Je pense qu'on ne peut pas couper à la définition de Wikipédia :
 
 [quote, https://en.wikipedia.org/wiki/Pattern_matching]
 --
-In computer science, pattern matching is the act of checking a given sequence of tokens for the presence of the constituents of some pattern
+In computer science, pattern matching is the act of checking a given sequence of tokens for the presence of the constituents of some pattern.
 --
 
-=== À quoi ça sert ?
+On a tendance à penser alors aux expressions régulières, mais non, il ne s'agit pas de cela.
+
+Là, les patterns à matcher sont des structures de données :
+
+* Des classes
+* Des interfaces
+* Des array
+* Et bien sûr des record !
+
+Je trouve que le cas du matching sur `instanceof` avec Type-Pattern est le plus facile à comprendre :
+
+[source,java]
+----
+if (vehicle instanceof Car car) {
+  car.drive();
+} else if (vehicle instanceof Plane plane) {
+  plane.fly();
+}
+----
+
+Ici le pattern à matcher est l'appartenance aux classes `Car` et `Plane`.
+On teste si l'instance a un des types, et une conversion implicite est faite vers une "binding variable" (`car` ou `plane`).
+
+== Qu'est-ce que la "déconstruction"
+
+Ce concept a un objectif similaire au I de SOLID : la ségrégation.
+
+Si je reçois un objet avec 42 champs alors que j'en ai besoin que de 2, la "deconstruction on pattern" va m'aider.
+
+Regardons ça avec du code.
+
+J'ai mon énorme dto reçu :
+
+[source,java]
+----
+public record Product(
+  String type,
+  String price,
+  String name,
+  // imaginez ici 39 autres champs
+){}
+----
+
+Mais la règle métier que je veux appliquer ne porte que sur le `type` et le `price`.
+Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une déconstruction du Record "Product" :
+
+[source,java]
+----
+if (object instanceof Product(String type, String price)) {
+  myUseCase.execute(type, price);
+}
+----
+
+Ici, `type` et `price` sont des "binding variables" générées implicitement si l'`object` match le pattern `Product`.
+
+=== Et ça sert à quoi ?
+
+Tout seul comme ça, pas encore grand chose.
+
+//Cela répond à un besoin fondamental des développeurs : faire varier des comportements à la Runtime. Pour un type on veut le comportement A, et pour un autre on veut le comportement B.
+
+Pour le cas du `instanceof`, on gagne toutefois nettement en intelligibilité du code.
+
+Comparez plutôt avec la méthode habituelle :
+
+[source,java]
+----
+if (vehicle instanceof Car) {
+  ((Car) vehicle).drive();
+} else if (vehicle instanceof Plane) {
+  ((Plane) vehicle).fly();
+}
+----
+
+
 
 === Dans quels langages on en trouve déjà
 
 * https://docs.scala-lang.org/tour/pattern-matching.html[Scala]
-
-== Faire varier des comportements à la runtime
-
-=== Exemples de variation de comportement
-
-* if this, then do something, else do something else
-* switch case
-* Spring FactoryBean
-* Qualifying beans before request scoped injection
-* Strategy pattern
-* Programmation fonctionnelle (mettre une Function en argument d'une méthode)
+* https://doc.rust-lang.org/rust-by-example/flow_control/match.html[Rust]
 
 == Qu’est-ce que ça va apporter à notre code ?
 
@@ -61,11 +124,16 @@ Plus de validation à la compile-time, et donc :
 * Développer plus intuitivement (le compilateur nous dis ce qu’on a oublié)
 * Faire émerger de meilleurs designs
 
+== Sur quelles structures de données Java 17 supporte-t-il le pattern matching ?
+
+== Et les autres structures de données, c'est pour quand ?
+
 == Conclusion
 
-// brainstorm area
-// * Pattern guards
-// * Sealed classes
+== brainstorm area
+
+* Pattern guards
+* Sealed classes
 
 
 
