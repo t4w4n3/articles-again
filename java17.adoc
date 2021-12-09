@@ -1,21 +1,25 @@
-= Java 17, plus qu’une LTS, une milestone du record & pattern matching
+= Java 17, le record & pattern matching c'est pour maintenant ?
+= Java 17, le record & pattern matching c'est pour demain !
 Antoine Salesse - a.salesse@younup.fr
 :toc:
 
 == Intro
 
-Promis juré, cet article n’est pas une liste de https://docs.oracle.com/javase/specs/jls/se17/html/index.html[JLS]footnote:[JLS : Java Language Specification] / JSRfootnote:[JSR : Java Specification Request] / JEPfootnote:[JEP : JDK Enhancement Proposal].
+Promis juré, cet article n’est pas une liste de https://docs.oracle.com/javase/specs/jls/se17/html/index.html[JLS]footnote:[JLS : Java Language Specification] / https://stackoverflow.com/a/51286665[JSR]footnote:[JSR : Java Specification Request] / https://stackoverflow.com/a/51286665[JEP]footnote:[JEP : JDK Enhancement Proposal].
 
 Depuis sa sortie en septembre 2021, les articles sur Java 17 pleuvent.
 
-Ça y est, on a bien compris que cette version est une LTSfootnote:[LTS : Long Term Support].
+Ça y est, on a bien compris que cette version est une https://stackoverflow.com/a/51286665[LTS]footnote:[LTS : Long Term Support].
 
-Mais c’est aussi bien plus que cela. C’est une milestone de l’objectif ambitieux nommé "Record and Array Pattern Matching".
+Mais c’est aussi bien plus que cela.
+C’est une milestone de l’objectif ambitieux nommé +
+*"Record and Array Pattern Matching"*.
+
 Cet objectif est un ensemble de fonctionnalités synergiques :
 
 * Les `instanceof` avec "Type Patterns"
 * La déconstruction de `record` (Peut-être Java 18 preview)
-* La déconstruction d'array (Java 18+ ?)
+* La déconstruction d’array (Java 18+ ?)
 * Les Switch on Patterns (Java 17 preview, et probablement dispo en 19)
 * Les imbrications de patterns
 
@@ -26,11 +30,96 @@ C’est donc de ces features dont on parle ici :
 
 Et avec bien sûr des exemples de code !
 
+== Les applications de gestions aujourd'hui
+
+Aujourd'hui (avant la disponibilité totale du "Record and Array Pattern Matching"), +
+le design de nos back-end d'applications de gestions pousse autour d'une problématique : +
+*Faire varier des comportements en fonction de cas d'usage*
+
+Dans une application modulaire idéale, un module représente un contexte métier (https://martinfowler.com/bliki/BoundedContext.html[Bounded Context]).
+
+Illustrons cela avec 3 contextes :
+
+* Customer
+* Administrator
+* Partner
+
+Tous les 3 manipulent le concept de Document, et se l'échangent à l'aide de https://en.wikipedia.org/wiki/Data_transfer_object[DTO]s, un pour chaque type de Document :
+
+* Contract
+* Invoice
+
+On y met une interface `Document` en commun :
+
+[source,java]
+----
+interface Document {}
+
+////////
+
+import lombok.Value;
+
+////////
+
+@Value
+public class Contract implements Document {
+	private final List<String> parties;
+	private final List<String> formalities;
+	private final List<String> terms;
+}
+
+////////
+
+@Value
+public class Invoice {
+	private final int amount;
+	private final String buyer;
+	private final String seller;
+}
+----
+
+Dans les 3 modules, on veut vérifier la validité des https://en.wikipedia.org/wiki/Data_transfer_object[DTO] reçus :
+
+* Dans le module Customer, une `Invoice` est valide à condition que `amount` soit non-null
+* Dans le module Administrator, une `Invoice` est valide à condition que `buyer` soit non-null
+* Dans le module Partner, une `Invoice` est valide à condition que `seller` soit non-null
+
+On peut alors avoir envie d'ajouter la méthode `validate()` à l'interface Document, et à l'implémenter dans chaque DTO.
+
+[source,java]
+----
+interface Document {
+	void validate();
+}
+
+////////
+
+import lombok.Value;
+
+////////
+
+@Value
+public class Contract implements Document {
+	private final List<String> parties;
+	private final List<String> formalities;
+	private final List<String> terms;
+}
+
+////////
+
+@Value
+public class Invoice {
+	private final int amount;
+	private final String buyer;
+	private final String seller;
+}
+----
+
 == Qu’est-ce que le pattern matching ?
 
 Je pense qu'on ne peut pas couper à la définition de Wikipédia :
 
-[quote, https://en.wikipedia.org/wiki/Pattern_matching]
+[quote,https://en.wikipedia.org/wiki/Pattern_matching]
 --
 In computer science, pattern matching is the act of checking a given sequence of tokens for the presence of the constituents of some pattern.
 --
@@ -42,7 +131,7 @@ Là, les patterns à matcher sont des structures de données :
 * Des classes
 * Des interfaces
 * Des array
-* Et bien sûr des record !
+* Et bien sûr des records !
 
 Je trouve que le cas du matching sur `instanceof` avec Type-Pattern est le plus facile à comprendre :
 
@@ -62,7 +151,7 @@ On teste si l'instance a un des types, et une conversion implicite est faite ver
 
 Ce concept a un objectif similaire au I de SOLID : la ségrégation.
 
-Si je reçois un objet avec 42 champs alors que j'en ai besoin que de 2, la "deconstruction on pattern" va m'aider.
+Si je reçois un objet avec 42 champs alors que j'en ai besoin que de 2, la "_deconstruction on pattern_" va m'aider.
 
 Regardons ça avec du code.
 
@@ -88,11 +177,11 @@ if (object instanceof Product(String type, String price)) {
 }
 ----
 
-Ici, `type` et `price` sont des "binding variables" générées implicitement si l'`object` match le pattern `Product`.
+Ici, `type` et `price` sont des "binding variables" générées implicitement si l’`object` match le pattern `Product`.
 
 === Et ça sert à quoi ?
 
-Tout seul comme ça, pas encore grand chose.
+Tout seul comme ça, pas encore grand-chose.
 
 //Cela répond à un besoin fondamental des développeurs : faire varier des comportements à la Runtime. Pour un type on veut le comportement A, et pour un autre on veut le comportement B.
 
@@ -109,12 +198,54 @@ if (vehicle instanceof Car) {
 }
 ----
 
+[source,java]
+----
+if (object instanceof Product) {
+  String type = ((Product) object).type;
+  String price = ((Product) object).price;
+  myUseCase.execute(type, price);
+}
+----
 
+Mais là où ça prend tout son intérêt, c'est quand on y ajoute le concept de classe scellée dans un "Switch on Pattern".
 
-=== Dans quels langages on en trouve déjà
+Voyons cela.
 
-* https://docs.scala-lang.org/tour/pattern-matching.html[Scala]
-* https://doc.rust-lang.org/rust-by-example/flow_control/match.html[Rust]
+[source,java]
+----
+public sealed interface Document permits Invoice, Contract {}
+public record Invoice(int amount, String buyer, String Seller) implements Document {}
+public record Contract(List<String> parties, List<String> formalities, List<String> terms) implements Document {}
+----
+
+Ici, grâce au mécanisme de sceau, on indique au compilateur la liste exhaustive des implémentations de Document :
+
+* Invoice
+* Contract
+
+Les DTO `Invoice` et `Contract` sont reçu dans les modules Customer, Administrator et Partner (1 module = 1 context métier).
+
+Pour chaque implémentation, on veut effectuer des validations métiers différentes.
+
+La méthode habituelle de la programmation orientée object, c'est d'avoir une méthode `void validate()` dans l'interface Document, et de la faire implémenter par Invoice et Contract.
+
+Le problème avec ça, c'est que
+
+Mettons alors qu'on reçoive un DTO Document.
+
+Implémentons la sélection de la validation à appliquer à l'aide
+
+[source,java]
+----
+
+----
+
+Implémentons la sélection de la validation à appliquer à l'aide d'un "Switch " on Pattern :
+
+[source,java]
+----
+
+----
 
 == Qu’est-ce que ça va apporter à notre code ?
 
@@ -124,9 +255,10 @@ Plus de validation à la compile-time, et donc :
 * Développer plus intuitivement (le compilateur nous dis ce qu’on a oublié)
 * Faire émerger de meilleurs designs
 
-== Sur quelles structures de données Java 17 supporte-t-il le pattern matching ?
+=== Dans quels langages on en trouve déjà
 
-== Et les autres structures de données, c'est pour quand ?
+* https://docs.scala-lang.org/tour/pattern-matching.html[Scala]
+* https://doc.rust-lang.org/rust-by-example/flow_control/match.html[Rust]
 
 == Conclusion
 
@@ -134,6 +266,7 @@ Plus de validation à la compile-time, et donc :
 
 * Pattern guards
 * Sealed classes
+* Expressivité
 
 
 
