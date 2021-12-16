@@ -5,8 +5,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.16">
-<meta name="author" content="Antoine Salesse - a.salesse@younup.fr">
-<title>Java 17, plus qu’une LTS, une milestone du record &amp; pattern matching</title>
+<meta name="author" content="= Java 17, le record &amp; pattern matching c&#8217;est pour demain !">
+<title>Java 17, le record &amp; pattern matching c&#8217;est pour maintenant ?</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -440,24 +440,27 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article">
 <div id="header">
-<h1>Java 17, plus qu’une LTS, une milestone du record &amp; pattern matching</h1>
+<h1>Java 17, le record &amp; pattern matching c&#8217;est pour maintenant ?</h1>
 <div class="details">
-<span id="author" class="author">Antoine Salesse - a.salesse@younup.fr</span><br>
+<span id="author" class="author">= Java 17, le record &amp; pattern matching c&#8217;est pour demain !</span><br>
+<span id="revdate">Antoine Salesse - a.salesse@younup.fr</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_intro">Intro</a></li>
+<li><a href="#_les_applications_de_gestions_aujourdhui">Les applications de gestions aujourd&#8217;hui</a></li>
 <li><a href="#_quest_ce_que_le_pattern_matching">Qu’est-ce que le pattern matching ?</a></li>
 <li><a href="#_quest_ce_que_la_déconstruction">Qu&#8217;est-ce que la "déconstruction"</a>
 <ul class="sectlevel2">
 <li><a href="#_et_ça_sert_à_quoi">Et ça sert à quoi ?</a></li>
+</ul>
+</li>
+<li><a href="#_quest_ce_que_ça_va_apporter_à_notre_code">Qu’est-ce que ça va apporter à notre code ?</a>
+<ul class="sectlevel2">
 <li><a href="#_dans_quels_langages_on_en_trouve_déjà">Dans quels langages on en trouve déjà</a></li>
 </ul>
 </li>
-<li><a href="#_quest_ce_que_ça_va_apporter_à_notre_code">Qu’est-ce que ça va apporter à notre code ?</a></li>
-<li><a href="#_sur_quelles_structures_de_données_java_17_supporte_t_il_le_pattern_matching">Sur quelles structures de données Java 17 supporte-t-il le pattern matching ?</a></li>
-<li><a href="#_et_les_autres_structures_de_données_cest_pour_quand">Et les autres structures de données, c&#8217;est pour quand ?</a></li>
 <li><a href="#_conclusion">Conclusion</a></li>
 <li><a href="#_brainstorm_area">brainstorm area</a></li>
 </ul>
@@ -468,17 +471,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_intro">Intro</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Promis juré, cet article n’est pas une liste de <a href="https://docs.oracle.com/javase/specs/jls/se17/html/index.html">JLS</a><sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> / JSR<sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> / JEP<sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup>.</p>
+<p>Promis juré, cet article n’est pas une liste de <a href="https://docs.oracle.com/javase/specs/jls/se17/html/index.html">JLS</a><sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> / <a href="https://stackoverflow.com/a/51286665">JSR</a><sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> / <a href="https://stackoverflow.com/a/51286665">JEP</a><sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup>.</p>
 </div>
 <div class="paragraph">
 <p>Depuis sa sortie en septembre 2021, les articles sur Java 17 pleuvent.</p>
 </div>
 <div class="paragraph">
-<p>Ça y est, on a bien compris que cette version est une LTS<sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup>.</p>
+<p>Ça y est, on a bien compris que cette version est une <a href="https://stackoverflow.com/a/51286665">LTS</a><sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup>.</p>
 </div>
 <div class="paragraph">
-<p>Mais c’est aussi bien plus que cela. C’est une milestone de l’objectif ambitieux nommé "Record and Array Pattern Matching".
-Cet objectif est un ensemble de fonctionnalités synergiques :</p>
+<p>Mais c’est aussi bien plus que cela.
+C’est une milestone de l’objectif ambitieux nommé<br>
+<strong>"Record and Array Pattern Matching"</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Cet objectif est un ensemble de fonctionnalités synergiques :</p>
 </div>
 <div class="ulist">
 <ul>
@@ -489,7 +496,7 @@ Cet objectif est un ensemble de fonctionnalités synergiques :</p>
 <p>La déconstruction de <code>record</code> (Peut-être Java 18 preview)</p>
 </li>
 <li>
-<p>La déconstruction d&#8217;array (Java 18+ ?)</p>
+<p>La déconstruction d’array (Java 18+ ?)</p>
 </li>
 <li>
 <p>Les Switch on Patterns (Java 17 preview, et probablement dispo en 19)</p>
@@ -514,6 +521,126 @@ Cet objectif est un ensemble de fonctionnalités synergiques :</p>
 </div>
 <div class="paragraph">
 <p>Et avec bien sûr des exemples de code !</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_les_applications_de_gestions_aujourdhui">Les applications de gestions aujourd&#8217;hui</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Aujourd&#8217;hui (avant la disponibilité totale du "Record and Array Pattern Matching"),<br>
+le design de nos back-end d&#8217;applications de gestions pousse autour d&#8217;une problématique :<br>
+<strong>Faire varier des comportements en fonction de cas d&#8217;usage</strong></p>
+</div>
+<div class="paragraph">
+<p>Dans une application modulaire idéale, un module représente un contexte métier (<a href="https://martinfowler.com/bliki/BoundedContext.html">Bounded Context</a>).</p>
+</div>
+<div class="paragraph">
+<p>Illustrons cela avec 3 contextes :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Customer</p>
+</li>
+<li>
+<p>Administrator</p>
+</li>
+<li>
+<p>Partner</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Tous les 3 manipulent le concept de Document, et se l&#8217;échangent à l&#8217;aide de <a href="https://en.wikipedia.org/wiki/Data_transfer_object">DTO</a>s, un pour chaque type de Document :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Contract</p>
+</li>
+<li>
+<p>Invoice</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>On y met une interface <code>Document</code> en commun :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">Document</span> {}
+
+<span style="color:#777">////////</span>
+
+<span style="color:#080;font-weight:bold">import</span> <span style="color:#B44;font-weight:bold">lombok.Value</span>;
+
+<span style="color:#777">////////</span>
+
+<span style="color:#007">@Value</span>
+<span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">Contract</span> <span style="color:#088;font-weight:bold">implements</span> <span style="color:#0a8;font-weight:bold">Document</span> {
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; parties;
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; formalities;
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; terms;
+}
+
+<span style="color:#777">////////</span>
+
+<span style="color:#007">@Value</span>
+<span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">Invoice</span> {
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#339;font-weight:bold">int</span> amount;
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#0a8;font-weight:bold">String</span> buyer;
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#0a8;font-weight:bold">String</span> seller;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Dans les 3 modules, on veut vérifier la validité des <a href="https://en.wikipedia.org/wiki/Data_transfer_object">DTO</a> reçus :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Dans le module Customer, une <code>Invoice</code> est valide à condition que <code>amount</code> soit non-null</p>
+</li>
+<li>
+<p>Dans le module Administrator, une <code>Invoice</code> est valide à condition que <code>buyer</code> soit non-null</p>
+</li>
+<li>
+<p>Dans le module Partner, une <code>Invoice</code> est valide à condition que <code>seller</code> soit non-null</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>On peut alors avoir envie d&#8217;ajouter la méthode <code>validate()</code> à l&#8217;interface Document, et à l&#8217;implémenter dans chaque DTO.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">Document</span> {
+        <span style="color:#339;font-weight:bold">void</span> validate();
+}
+
+<span style="color:#777">////////</span>
+
+<span style="color:#080;font-weight:bold">import</span> <span style="color:#B44;font-weight:bold">lombok.Value</span>;
+
+<span style="color:#777">////////</span>
+
+<span style="color:#007">@Value</span>
+<span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">Contract</span> <span style="color:#088;font-weight:bold">implements</span> <span style="color:#0a8;font-weight:bold">Document</span> {
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; parties;
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; formalities;
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; terms;
+}
+
+<span style="color:#777">////////</span>
+
+<span style="color:#007">@Value</span>
+<span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">Invoice</span> {
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#339;font-weight:bold">int</span> amount;
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#0a8;font-weight:bold">String</span> buyer;
+        <span style="color:#088;font-weight:bold">private</span> <span style="color:#088;font-weight:bold">final</span> <span style="color:#0a8;font-weight:bold">String</span> seller;
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -551,7 +678,7 @@ Cet objectif est un ensemble de fonctionnalités synergiques :</p>
 <p>Des array</p>
 </li>
 <li>
-<p>Et bien sûr des record !</p>
+<p>Et bien sûr des records !</p>
 </li>
 </ul>
 </div>
@@ -580,7 +707,7 @@ On teste si l&#8217;instance a un des types, et une conversion implicite est fai
 <p>Ce concept a un objectif similaire au I de SOLID : la ségrégation.</p>
 </div>
 <div class="paragraph">
-<p>Si je reçois un objet avec 42 champs alors que j&#8217;en ai besoin que de 2, la "deconstruction on pattern" va m&#8217;aider.</p>
+<p>Si je reçois un objet avec 42 champs alors que j&#8217;en ai besoin que de 2, la "<em>deconstruction on pattern</em>" va m&#8217;aider.</p>
 </div>
 <div class="paragraph">
 <p>Regardons ça avec du code.</p>
@@ -610,12 +737,12 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 </div>
 </div>
 <div class="paragraph">
-<p>Ici, <code>type</code> et <code>price</code> sont des "binding variables" générées implicitement si l'`object` match le pattern <code>Product</code>.</p>
+<p>Ici, <code>type</code> et <code>price</code> sont des "binding variables" générées implicitement si l’<code>object</code> match le pattern <code>Product</code>.</p>
 </div>
 <div class="sect2">
 <h3 id="_et_ça_sert_à_quoi">Et ça sert à quoi ?</h3>
 <div class="paragraph">
-<p>Tout seul comme ça, pas encore grand chose.</p>
+<p>Tout seul comme ça, pas encore grand-chose.</p>
 </div>
 <div class="paragraph">
 <p>Pour le cas du <code>instanceof</code>, on gagne toutefois nettement en intelligibilité du code.</p>
@@ -632,18 +759,71 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 }</code></pre>
 </div>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#080;font-weight:bold">if</span> (object <span style="color:#080;font-weight:bold">instanceof</span> Product) {
+  <span style="color:#0a8;font-weight:bold">String</span> type = ((Product) object).type;
+  <span style="color:#0a8;font-weight:bold">String</span> price = ((Product) object).price;
+  myUseCase.execute(type, price);
+}</code></pre>
 </div>
-<div class="sect2">
-<h3 id="_dans_quels_langages_on_en_trouve_déjà">Dans quels langages on en trouve déjà</h3>
+</div>
+<div class="paragraph">
+<p>Mais là où ça prend tout son intérêt, c&#8217;est quand on y ajoute le concept de classe scellée dans un "Switch on Pattern".</p>
+</div>
+<div class="paragraph">
+<p>Voyons cela.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#088;font-weight:bold">public</span> sealed <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">Document</span> permits Invoice, Contract {}
+<span style="color:#088;font-weight:bold">public</span> record Invoice(<span style="color:#339;font-weight:bold">int</span> amount, <span style="color:#0a8;font-weight:bold">String</span> buyer, <span style="color:#0a8;font-weight:bold">String</span> Seller) <span style="color:#088;font-weight:bold">implements</span> <span style="color:#0a8;font-weight:bold">Document</span> {}
+<span style="color:#088;font-weight:bold">public</span> record Contract(<span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; parties, <span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; formalities, <span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; terms) <span style="color:#088;font-weight:bold">implements</span> <span style="color:#0a8;font-weight:bold">Document</span> {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ici, grâce au mécanisme de sceau, on indique au compilateur la liste exhaustive des implémentations de Document :</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://docs.scala-lang.org/tour/pattern-matching.html">Scala</a></p>
+<p>Invoice</p>
 </li>
 <li>
-<p><a href="https://doc.rust-lang.org/rust-by-example/flow_control/match.html">Rust</a></p>
+<p>Contract</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>Les DTO <code>Invoice</code> et <code>Contract</code> sont reçu dans les modules Customer, Administrator et Partner (1 module = 1 context métier).</p>
+</div>
+<div class="paragraph">
+<p>Pour chaque implémentation, on veut effectuer des validations métiers différentes.</p>
+</div>
+<div class="paragraph">
+<p>La méthode habituelle de la programmation orientée object, c&#8217;est d&#8217;avoir une méthode <code>void validate()</code> dans l&#8217;interface Document, et de la faire implémenter par Invoice et Contract.</p>
+</div>
+<div class="paragraph">
+<p>Le problème avec ça, c&#8217;est que</p>
+</div>
+<div class="paragraph">
+<p>Mettons alors qu&#8217;on reçoive un DTO Document.</p>
+</div>
+<div class="paragraph">
+<p>Implémentons la sélection de la validation à appliquer à l&#8217;aide</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Implémentons la sélection de la validation à appliquer à l&#8217;aide d&#8217;un "Switch " on Pattern :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"></code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -667,18 +847,19 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 </li>
 </ul>
 </div>
+<div class="sect2">
+<h3 id="_dans_quels_langages_on_en_trouve_déjà">Dans quels langages on en trouve déjà</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.scala-lang.org/tour/pattern-matching.html">Scala</a></p>
+</li>
+<li>
+<p><a href="https://doc.rust-lang.org/rust-by-example/flow_control/match.html">Rust</a></p>
+</li>
+</ul>
 </div>
 </div>
-<div class="sect1">
-<h2 id="_sur_quelles_structures_de_données_java_17_supporte_t_il_le_pattern_matching">Sur quelles structures de données Java 17 supporte-t-il le pattern matching ?</h2>
-<div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="_et_les_autres_structures_de_données_cest_pour_quand">Et les autres structures de données, c&#8217;est pour quand ?</h2>
-<div class="sectionbody">
-
 </div>
 </div>
 <div class="sect1">
@@ -697,6 +878,9 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 </li>
 <li>
 <p>Sealed classes</p>
+</li>
+<li>
+<p>Expressivité</p>
 </li>
 </ul>
 </div>
@@ -720,7 +904,7 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-12-02 17:57:27 +0100
+Last updated 2021-12-09 13:59:29 +0100
 </div>
 </div>
 </body>
