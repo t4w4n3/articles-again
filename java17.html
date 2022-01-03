@@ -450,6 +450,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_intro">Intro</a></li>
 <li><a href="#_les_applications_de_gestion_aujourdhui">Les applications de gestion aujourd’hui</a></li>
 <li><a href="#_quest_ce_que_le_pattern_matching">Qu’est-ce que le pattern matching ?</a></li>
+<li><a href="#_comment_le_pattern_matching_remplace_t_il_le_visitor_pattern">Comment le Pattern Matching remplace-t-il le visitor pattern ?</a></li>
 <li><a href="#_quest_ce_que_la_déconstruction">Qu’est-ce que la "déconstruction"</a>
 <ul class="sectlevel2">
 <li><a href="#_et_ça_sert_à_quoi">Et ça sert à quoi ?</a></li>
@@ -489,7 +490,7 @@ C’est une milestone de l’objectif ambitieux nommé<br>
 <div class="ulist">
 <ul>
 <li>
-<p>Les <code>instanceof</code> avec "Type Patterns" (dispo en Java 17)</p>
+<p>Les <code>instanceof</code> avec "Type Patterns" (dispo en 16)</p>
 </li>
 <li>
 <p>Les Switch on Patterns (dispo en 17 preview)</p>
@@ -501,7 +502,7 @@ C’est une milestone de l’objectif ambitieux nommé<br>
 <p>La déconstruction de <code>record</code> (Peut-être dispo en 19 preview)</p>
 </li>
 <li>
-<p>Les imbrications de patterns (dispo en xx)</p>
+<p>Les imbrications de patterns (pas de visibilité de dispo)</p>
 </li>
 </ul>
 </div>
@@ -559,7 +560,7 @@ On retrouve alors au moins 2 designs de partage de ce concept :</p>
 <dd>
 <p>Elle peut prendre la forme d’un monolith modulaire, ou bien de microservices.<br>
 Chacun des modules/services possède un package <code>domain</code> où on modélise le domaine métier, dont <code>Document</code>.<br>
-Ils utilisent des mappers pour s’échanger le concept de <code>Document</code> à l’aide de <a href="https://en.wikipedia.org/wiki/Data_transfer_object">DTO</a>s, envoyés en http (microservices) ou en runtime (monolith modulaire).<br>
+Ils utilisent des mappers pour s’échanger le concept de <code>Document</code> à travers de <a href="https://en.wikipedia.org/wiki/Data_transfer_object">DTO</a>s, envoyés en http (microservices) ou en runtime (monolith modulaire).<br>
 Grace au découplage des contextes métiers, les méthodes des classes <code>Document</code> ne peuvent pas être appelées depuis les autres modules.<br>
 On peut alors se permettre de laisser <code>Document</code> responsable de la logique métier le concernant.</p>
 </dd>
@@ -572,7 +573,7 @@ On a toujours une classe <code>Document</code> dans un package <code>domain</cod
 </dl>
 </div>
 <div class="paragraph">
-<p>Dans le premier cas, tout va bien, continuons à continuer ainsi &#8230;&#8203;</p>
+<p>Dans le premier design, tout va bien, continuons à continuer ainsi &#8230;&#8203;</p>
 </div>
 <div class="paragraph">
 <p>Mais dans le deuxième, attention !</p>
@@ -590,10 +591,10 @@ Cela impacte fortement la parallélisation, le scope (et donc la vitesse) de rec
 <div class="ulist">
 <ul>
 <li>
-<p>le <a href="https://en.wikipedia.org/wiki/Visitor_pattern#Sources_3">visitor pattern</a></p>
+<p>le <a href="https://en.wikipedia.org/wiki/Visitor_pattern#Sources_3">visitor pattern</a><sup class="footnote">[<a id="_footnoteref_5" class="footnote" href="#_footnotedef_5" title="View footnote.">5</a>]</sup></p>
 </li>
 <li>
-<p>le everything-is-a-service avec des méthodes à 8 arguments</p>
+<p>le everything-is-a-service avec des méthodes à 8 arguments (un anti-pattern d&#8217;après moi)</p>
 </li>
 </ul>
 </div>
@@ -656,6 +657,12 @@ Cela impacte fortement la parallélisation, le scope (et donc la vitesse) de rec
 <p>Ici le pattern à matcher est l’appartenance aux classes <code>Car</code> et <code>Plane</code>.
 On teste si l’instance a un des types, et une conversion implicite est faite vers une "binding variable" (<code>car</code> ou <code>plane</code>).</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_comment_le_pattern_matching_remplace_t_il_le_visitor_pattern">Comment le Pattern Matching remplace-t-il le visitor pattern ?</h2>
+<div class="sectionbody">
+
 </div>
 </div>
 <div class="sect1">
@@ -740,7 +747,7 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 </div>
 </div>
 <div class="paragraph">
-<p>Ici, grâce au mécanisme de sceau, on indique au compilateur la liste exhaustive des implémentations de Document :</p>
+<p>Ici, grâce au mécanisme de sceau (<code>sealed</code>), on indique au compilateur la liste exhaustive des implémentations de Document :</p>
 </div>
 <div class="ulist">
 <ul>
@@ -832,7 +839,7 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 <div class="ulist">
 <ul>
 <li>
-<p>Pattern guards</p>
+<p>Pattern guards, Guarded Pattern</p>
 </li>
 <li>
 <p>Sealed classes</p>
@@ -862,10 +869,13 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 <div class="footnote" id="_footnotedef_4">
 <a href="#_footnoteref_4">4</a>. LTS : Long Term Support
 </div>
+<div class="footnote" id="_footnotedef_5">
+<a href="#_footnoteref_5">5</a>. Today, to express ad-hoc polymorphic calculations like this we would use the cumbersome visitor pattern. source : <a href="https://openjdk.java.net/jeps/405" class="bare">https://openjdk.java.net/jeps/405</a>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-01-03 16:08:07 +0100
+Last updated 2022-01-03 16:27:10 +0100
 </div>
 </div>
 </body>
