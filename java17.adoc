@@ -1,5 +1,4 @@
 = Java 17, le record & pattern matching c'est pour maintenant ?
-= Java 17, le record & pattern matching c'est pour demain !
 Antoine Salesse - a.salesse@younup.fr
 :toc:
 
@@ -17,11 +16,11 @@ C’est une milestone de l’objectif ambitieux nommé +
 
 Cet objectif est un ensemble de fonctionnalités synergiques :
 
-* Les `instanceof` avec "Type Patterns"
-* La déconstruction de `record` (Peut-être Java 18 preview)
-* La déconstruction d’array (Java 18+ ?)
-* Les Switch on Patterns (Java 17 preview, et probablement dispo en 19)
-* Les imbrications de patterns
+* Les `instanceof` avec "Type Patterns" (dispo en Java 17)
+* La déconstruction de `record` (Peut-être dispo en 19 preview)
+* La déconstruction d’array (Peut-être dispo en 19 preview)
+* Les Switch on Patterns (dispo en 17 preview)
+* Les imbrications de patterns (dispo en xx)
 
 C’est donc de ces features dont on parle ici :
 
@@ -44,7 +43,7 @@ Illustrons cela avec 3 contextes :
 * Administrator
 * Partner
 
-Tous les 3 manipulent le concept de Document, et se l'échangent à l'aide de https://en.wikipedia.org/wiki/Data_transfer_object[DTO]s, un pour chaque type de Document :
+Tous les 3 manipulent le concept de `Document`, et se l'échangent à l'aide de https://en.wikipedia.org/wiki/Data_transfer_object[DTO]s, un pour chaque type de Document :
 
 * Contract
 * Invoice
