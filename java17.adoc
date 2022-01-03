@@ -1,4 +1,4 @@
-= Java 17, le record & pattern matching c'est pour maintenant ?
+= Java 17, le record & pattern matching c’est pour maintenant ?
 Antoine Salesse - a.salesse@younup.fr
 :toc:
 
@@ -17,9 +17,9 @@ C’est une milestone de l’objectif ambitieux nommé +
 Cet objectif est un ensemble de fonctionnalités synergiques :
 
 * Les `instanceof` avec "Type Patterns" (dispo en Java 17)
-* La déconstruction de `record` (Peut-être dispo en 19 preview)
-* La déconstruction d’array (Peut-être dispo en 19 preview)
 * Les Switch on Patterns (dispo en 17 preview)
+* La déconstruction d’array (Peut-être dispo en 19 preview)
+* La déconstruction de `record` (Peut-être dispo en 19 preview)
 * Les imbrications de patterns (dispo en xx)
 
 C’est donc de ces features dont on parle ici :
@@ -29,11 +29,10 @@ C’est donc de ces features dont on parle ici :
 
 Et avec bien sûr des exemples de code !
 
-== Les applications de gestions aujourd'hui
+== Les applications de gestion aujourd’hui
 
-Aujourd'hui (avant la disponibilité totale du "Record and Array Pattern Matching"), +
-le design de nos back-end d'applications de gestions pousse autour d'une problématique : +
-*Faire varier des comportements en fonction de cas d'usage*
+Aujourd’hui le design de nos back-end d’applications de gestions pousse autour d’une problématique : +
+*Faire varier des comportements en fonction de cas d’usage*
 
 Dans une application modulaire idéale, un module représente un contexte métier (https://martinfowler.com/bliki/BoundedContext.html[Bounded Context]).
 
@@ -43,87 +42,49 @@ Illustrons cela avec 3 contextes :
 * Administrator
 * Partner
 
-Tous les 3 manipulent le concept de `Document`, et se l'échangent à l'aide de https://en.wikipedia.org/wiki/Data_transfer_object[DTO]s, un pour chaque type de Document :
+Tous les 3 manipulent le concept de `Document`. +
+On retrouve alors au moins 2 designs de partage de ce concept :
 
-* Contract
-* Invoice
+1.{nbsp}L’architecture hexagonale modulaire::
+Elle peut prendre la forme d’un monolith modulaire, ou bien de microservices. +
+Chacun des modules/services possède un package `domain` où on modélise le domaine métier, dont `Document`. +
+Ils utilisent des mappers pour s’échanger le concept de `Document` à l’aide de https://en.wikipedia.org/wiki/Data_transfer_object[DTO]s, envoyés en http (microservices) ou en runtime (monolith modulaire). +
+Grace au découplage des contextes métiers, les méthodes des classes `Document` ne peuvent pas être appelées depuis les autres modules. +
+On peut alors se permettre de laisser `Document` responsable de la logique métier le concernant.
+// mettre un schéma ici
 
-On y met une interface `Document` en commun :
+2.{nbsp}L’architecture monolithique::
+Ici les contextes métiers n’ont pas été découverts et il n’y a alors pas de frontière découplante entre eux. +
+C’est acceptable pour une application raisonnablement complexe, dans laquelle il n’y a d'ailleurs peut-être même qu’un seul context métier. +
+//Un monolith modulaire sans découplage entre les modules n'est alors pas modulaire par essence.
+On a toujours une classe `Document` dans un package `domain`.
 
-[source,java]
-----
-interface Document {}
+Dans le premier design, tout va bien, continuons à continuer ainsi ...
 
-////////
+Mais dans le deuxième, attention !
 
-import lombok.Value;
+Si on met dans `Document` la logique métier agissant dessus, alors on couple fortement la totalité de l'application avec l'implémentation de `Document` !
+Cela impacte fortement la parallélisation, le scope (et donc la vitesse) de recompilation de l'application.
 
-////////
+On veut alors *séparer la logique métier des entités sur lesquelles elle agit*.
 
-@Value
-public class Contract implements Document {
-	private final List<String> parties;
-	private final List<String> formalities;
-	private final List<String> terms;
-}
+Pour y parvenir, on utilisait jusque-là 2 pattern :
 
-////////
+* le https://en.wikipedia.org/wiki/Visitor_pattern#Sources_3[visitor pattern]
+* le everything-is-a-service avec des méthodes à 8 arguments (un anti-pattern d'après moi)
 
-@Value
-public class Invoice {
-	private final int amount;
-	private final String buyer;
-	private final String seller;
-}
-----
-
-Dans les 3 modules, on veut vérifier la validité des https://en.wikipedia.org/wiki/Data_transfer_object[DTO] reçus :
-
-* Dans le module Customer, une `Invoice` est valide à condition que `amount` soit non-null
-* Dans le module Administrator, une `Invoice` est valide à condition que `buyer` soit non-null
-* Dans le module Partner, une `Invoice` est valide à condition que `seller` soit non-null
-
-On peut alors avoir envie d'ajouter la méthode `validate()` à l'interface Document, et à l'implémenter dans chaque DTO.
-
-[source,java]
-----
-interface Document {
-	void validate();
-}
-
-////////
-
-import lombok.Value;
-
-////////
-
-@Value
-public class Contract implements Document {
-	private final List<String> parties;
-	private final List<String> formalities;
-	private final List<String> terms;
-}
-
-////////
-
-@Value
-public class Invoice {
-	private final int amount;
-	private final String buyer;
-	private final String seller;
-}
-----
+Mais à présent avec java 17, une troisième solution élégante s'offre à nous : Le Pattern Matching.
 
 == Qu’est-ce que le pattern matching ?
 
-Je pense qu'on ne peut pas couper à la définition de Wikipédia :
+Je pense qu’on ne peut pas couper à la définition de Wikipédia :
 
 [quote,https://en.wikipedia.org/wiki/Pattern_matching]
 --
 In computer science, pattern matching is the act of checking a given sequence of tokens for the presence of the constituents of some pattern.
 --
 
-On a tendance à penser alors aux expressions régulières, mais non, il ne s'agit pas de cela.
+On a tendance à penser alors aux expressions régulières, mais non, il ne s’agit pas de cela.
 
 Là, les patterns à matcher sont des structures de données :
 
@@ -143,18 +104,20 @@ if (vehicle instanceof Car car) {
 }
 ----
 
-Ici le pattern à matcher est l'appartenance aux classes `Car` et `Plane`.
-On teste si l'instance a un des types, et une conversion implicite est faite vers une "binding variable" (`car` ou `plane`).
+Ici le pattern à matcher est l’appartenance aux classes `Car` et `Plane`.
+On teste si l’instance a un des types, et une conversion implicite est faite vers une "binding variable" (`car` ou `plane`).
 
-== Qu'est-ce que la "déconstruction"
+== Comment le Pattern Matching remplace-t-il le visitor pattern ?
+
+== Qu’est-ce que la "déconstruction"
 
 Ce concept a un objectif similaire au I de SOLID : la ségrégation.
 
-Si je reçois un objet avec 42 champs alors que j'en ai besoin que de 2, la "_deconstruction on pattern_" va m'aider.
+Si je reçois un objet avec 42 champs alors que j’en ai besoin que de 2, la "_deconstruction on pattern_" va m’aider.
 
 Regardons ça avec du code.
 
-J'ai mon énorme dto reçu :
+J’ai mon énorme dto reçu :
 
 [source,java]
 ----
@@ -206,7 +169,7 @@ if (object instanceof Product) {
 }
 ----
 
-Mais là où ça prend tout son intérêt, c'est quand on y ajoute le concept de classe scellée dans un "Switch on Pattern".
+Mais là où ça prend tout son intérêt, c’est quand on y ajoute le concept de classe scellée dans un "Switch on Pattern".
 
 Voyons cela.
 
@@ -217,7 +180,7 @@ public record Invoice(int amount, String buyer, String Seller) implements Docume
 public record Contract(List<String> parties, List<String> formalities, List<String> terms) implements Document {}
 ----
 
-Ici, grâce au mécanisme de sceau, on indique au compilateur la liste exhaustive des implémentations de Document :
+Ici, grâce au mécanisme de sceau (`sealed`), on indique au compilateur la liste exhaustive des implémentations de Document :
 
 * Invoice
 * Contract
@@ -226,20 +189,20 @@ Les DTO `Invoice` et `Contract` sont reçu dans les modules Customer, Administra
 
 Pour chaque implémentation, on veut effectuer des validations métiers différentes.
 
-La méthode habituelle de la programmation orientée object, c'est d'avoir une méthode `void validate()` dans l'interface Document, et de la faire implémenter par Invoice et Contract.
+La méthode habituelle de la programmation orientée object, c’est d’avoir une méthode `void validate()` dans l’interface Document, et de la faire implémenter par Invoice et Contract.
 
-Le problème avec ça, c'est que
+Le problème avec ça, c’est que
 
-Mettons alors qu'on reçoive un DTO Document.
+Mettons alors qu’on reçoive un DTO Document.
 
-Implémentons la sélection de la validation à appliquer à l'aide
+Implémentons la sélection de la validation à appliquer à l’aide
 
 [source,java]
 ----
 
 ----
 
-Implémentons la sélection de la validation à appliquer à l'aide d'un "Switch " on Pattern :
+Implémentons la sélection de la validation à appliquer à l’aide d’un "Switch " on Pattern :
 
 [source,java]
 ----
@@ -263,9 +226,7 @@ Plus de validation à la compile-time, et donc :
 
 == brainstorm area
 
-* Pattern guards
+* Pattern guards, Guarded Pattern
 * Sealed classes
 * Expressivité
-
-
-
+* le pattern matching permet de séparer la logique métier des entités sur lesquelles elle agit (Tout comme le pattern Visitor).
