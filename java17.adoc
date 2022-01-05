@@ -109,6 +109,11 @@ On teste si l’instance a un des types, et une conversion implicite est faite v
 
 == Comment le Pattern Matching remplace-t-il le visitor pattern ?
 
+//Des exemples furent promis, des exemples sont alors donnés.
+Exemples j'ai promis, exemples je donne.
+
+
+
 == Qu’est-ce que la "déconstruction"
 
 Ce concept a un objectif similaire au I de SOLID : la ségrégation.
