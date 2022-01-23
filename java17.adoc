@@ -1,16 +1,18 @@
 = Java 17, le record & pattern matching c’est pour maintenant ?
 Antoine Salesse - a.salesse@younup.fr
 :toc:
+:caution-caption: ⚠
 
 == Intro
 
-Promis juré, cet article n’est pas une liste de https://docs.oracle.com/javase/specs/jls/se17/html/index.html[JLS]footnote:[JLS : Java Language Specification] / https://stackoverflow.com/a/51286665[JSR]footnote:[JSR : Java Specification Request] / https://stackoverflow.com/a/51286665[JEP]footnote:[JEP : JDK Enhancement Proposal].
+Promis juré, cet article n’est pas une liste des "nouvelles fonctionnalités de Java" (https://docs.oracle.com/javase/specs/jls/se17/html/index.html[JLS]footnote:[JLS : Java Language Specification] /
+https://stackoverflow.com/a/51286665[JSR]footnote:[JSR : Java Specification Request] / https://stackoverflow.com/a/51286665[JEP]footnote:[JEP : JDK Enhancement Proposal] ).
 
-Depuis sa sortie en septembre 2021, les articles sur Java 17 pleuvent.
+Depuis sa sortie en septembre 2021, les articles sur Java *17* pleuvent.
 
-Ça y est, on a bien compris que cette version est une https://stackoverflow.com/a/51286665[LTS]footnote:[LTS : Long Term Support].
+Ok, ça y est, on a bien compris que cette version est une https://stackoverflow.com/a/51286665[LTS]footnote:[LTS : Long Term Support].
 
-Mais c’est aussi bien plus que cela.
+Mais c’est aussi bien plus que cela. +
 C’est une milestone de l’objectif ambitieux nommé +
 *"Record and Array Pattern Matching"*.
 
@@ -25,13 +27,14 @@ Cet objectif est un ensemble de fonctionnalités synergiques :
 C’est donc de ces features dont on parle ici :
 
 * À quoi elles servent ?
-* Que vont-elles apporter à notre code ?
+* Comment et dans quels contextes les utiliser ?
+* Qu'apportent-elles à notre code ?
 
 Et avec bien sûr des exemples de code !
 
 == Les applications de gestion aujourd’hui
 
-Aujourd’hui le design de nos back-end d’applications de gestions pousse autour d’une problématique : +
+Aujourd’hui le design de nos backend d’applications de gestions pousse (🌱) autour d’une problématique : +
 *Faire varier des comportements en fonction de cas d’usage*
 
 Dans une application modulaire idéale, un module représente un contexte métier (https://martinfowler.com/bliki/BoundedContext.html[Bounded Context]).
@@ -61,6 +64,7 @@ On a toujours une classe `Document` dans un package `domain`.
 
 Dans le premier design, tout va bien, continuons à continuer ainsi ...
 
+[CAUTION]
 Mais dans le deuxième, attention !
 
 Si on met dans `Document` la logique métier agissant dessus, alors on couple fortement la totalité de l'application avec l'implémentation de `Document` !
