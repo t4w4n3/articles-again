@@ -6,7 +6,7 @@ Antoine Salesse - a.salesse@younup.fr
 == Intro
 
 Promis juré, cet article n’est pas une liste des "nouvelles fonctionnalités de Java" (https://docs.oracle.com/javase/specs/jls/se17/html/index.html[JLS]footnote:[JLS : Java Language Specification] /
-https://stackoverflow.com/a/51286665[JSR]footnote:[JSR : Java Specification Request] / https://stackoverflow.com/a/51286665[JEP]footnote:[JEP : JDK Enhancement Proposal] ).
+https://stackoverflow.com/a/51286665[JSR]footnote:[JSR : Java Specification Request] / https://stackoverflow.com/a/51286665[JEP]footnote:[JEP : JDK Enhancement Proposal]).
 
 Depuis sa sortie en septembre 2021, les articles sur Java *17* pleuvent.
 
@@ -19,16 +19,16 @@ C’est une milestone de l’objectif ambitieux nommé +
 Cet objectif est un ensemble de fonctionnalités synergiques :
 
 * Les `instanceof` avec "Type Patterns" (dispo en 16)
-* Les Switch on Patterns (dispo en 17 preview)
-* La déconstruction d’array (Peut-être dispo en 19 preview)
-* La déconstruction de `record` (Peut-être dispo en 19 preview)
+* Les Switch on Patterns (Java 17 preview, et probablement dispo en 19)
+* La déconstruction de `record` (Peut-être Java 19 preview)
+* La déconstruction d’array (Java 19+ ?)
 * Les imbrications de patterns (pas de visibilité de dispo)
 
 C’est donc de ces features dont on parle ici :
 
 * À quoi elles servent ?
 * Comment et dans quels contextes les utiliser ?
-* Qu'apportent-elles à notre code ?
+* Qu’apportent-elles à notre code ?
 
 Et avec bien sûr des exemples de code !
 
@@ -37,47 +37,117 @@ Et avec bien sûr des exemples de code !
 Aujourd’hui le design de nos backend d’applications de gestions pousse (🌱) autour d’une problématique : +
 *Faire varier des comportements en fonction de cas d’usage*
 
-Dans une application modulaire idéale, un module représente un contexte métier (https://martinfowler.com/bliki/BoundedContext.html[Bounded Context]).
+Dans ce genre d'applications, quelle que soit l'architecture choisie ou le style dev, on se retrouve à un moment ou un autre à :
 
-Illustrons cela avec 3 contextes :
+1.{nbsp}Modéliser notre domaine métier ::
+Cela peut être fait dans un package spécifique avec des POJO, ou avec des `Entity` JPA. +
+La seconde option est la plus répandue, mais ce n'est pas ma préférée.
+Je trouve que c'est une erreur de concevoir le business d'une application autour d'une base de données. +
+2.{nbsp}Écrire des DTO ::
+Dans l'idéal, un dto est immutable (Il n'y a aucune raison de changer la représentation d'une donnée transmise à un moment T). +
+Le Record est la structure de données la plus appropriée. +
+Sinon, avant Java 14, on a les `@Value` de Lombok.
 
-* Customer
-* Administrator
-* Partner
+Dans nos applications modulaires, on peut avoir envie de partager ces structures de données entre les modules :
 
-Tous les 3 manipulent le concept de `Document`. +
-On retrouve alors au moins 2 designs de partage de ce concept :
+[plantuml,a,png]
+----
+@startuml
+allow_mixing
 
-1.{nbsp}L’architecture hexagonale modulaire::
-Elle peut prendre la forme d’un monolith modulaire, ou bien de microservices. +
-Chacun des modules/services possède un package `domain` où on modélise le domaine métier, dont `Document`. +
-Ils utilisent des mappers pour s’échanger le concept de `Document` à travers de https://en.wikipedia.org/wiki/Data_transfer_object[DTO]s, envoyés en http (microservices) ou en runtime (monolith modulaire). +
-Grace au découplage des contextes métiers, les méthodes des classes `Document` ne peuvent pas être appelées depuis les autres modules. +
-On peut alors se permettre de laisser `Document` responsable de la logique métier le concernant.
-// mettre un schéma ici
+node "Domain model" {
+	class Facture
+}
 
-2.{nbsp}L’architecture monolithique::
-Ici les contextes métiers n’ont pas été découverts et il n’y a alors pas de frontière découplante entre eux. +
-C’est acceptable pour une application raisonnablement complexe, dans laquelle il n’y a d'ailleurs peut-être même qu’un seul context métier. +
-//Un monolith modulaire sans découplage entre les modules n'est alors pas modulaire par essence.
-On a toujours une classe `Document` dans un package `domain`.
+node "Module lettrage" {
+	usecase usecaseLettragePartiel
+	usecaseLettragePartiel - Facture
+}
 
-Dans le premier design, tout va bien, continuons à continuer ainsi ...
+node "Module recouvrement" {
+	usecase usecasePremiereRelance
+	usecasePremiereRelance - Facture
+}
 
-[CAUTION]
-Mais dans le deuxième, attention !
+@enduml
+----
 
-Si on met dans `Document` la logique métier agissant dessus, alors on couple fortement la totalité de l'application avec l'implémentation de `Document` !
-Cela impacte fortement la parallélisation, le scope (et donc la vitesse) de recompilation de l'application.
+Et bien pour faire varier les comportements des actions affectant ces classes, la POO nous incite à ajouter des méthodes sur nos classes de domaine. +
+//En effet, c'est un Objet, il a un état, et il peut porter des méthodes consommant ou modifiant cet état.
 
-On veut alors *séparer la logique métier des entités sur lesquelles elle agit*.
+Par exemple, pour la domain-class `Facture`, le module lettrage pourrait vouloir ajouter une méthode `calculerMontantRestantAPayer()`. +
+Le module envoie pourrait vouloir une méthode `getDestinataires()`.
 
-Pour y parvenir, on utilisait jusque-là 2 pattern :
+[plantuml,Modèle de domaine avec Facture et cas d'utilisation,png]
+----
+@startuml
+allow_mixing
 
-* le https://en.wikipedia.org/wiki/Visitor_pattern#Sources_3[visitor pattern]footnote:["Today, to express ad-hoc polymorphic calculations like this we would use the cumbersome visitor pattern". source : https://openjdk.java.net/jeps/405]
-* le everything-is-a-service avec des méthodes à 8 arguments (un anti-pattern d'après moi)
+node "Domain model" {
 
-Mais à présent avec java 17, une troisième solution élégante s'offre à nous : Le Pattern Matching.
+
+	class Facture implements MontantCalculable, Envoyable {
+	Integer calculerMontantRestantAPayer()
+	List<Personne> getDestinataires()
+  }
+
+  interface MontantCalculable
+  interface Envoyable
+}
+
+node "Module lettrage" {
+  usecase usecaseLettrage1
+  usecaseLettrage1 - Facture
+}
+
+node "Module envoi" {
+  usecase usecaseEnvoi1
+  usecaseEnvoi1 - Facture
+}
+
+@enduml
+----
+
+[source,java]
+----
+class Facture implements MontantCalculable, Envoyable {
+	private String libelle;
+	private CodeFacture code;
+	private Client client;
+	private Reçu reçu;
+	private Devise montant;
+
+	@Override
+	public Integer calculerMontantRestantAPayer(){
+		...
+	}
+
+	@Override
+	public List<Personne> getDestinataires(){
+		...
+	}
+
+	...
+}
+----
+
+Au bout d'un moment, notre domain-class `Facture` a beaucoup de méthodes issues de différents modules. +
+Le module lettrage utilise `Facture` et se retrouve à pouvoir appeler les méthodes du module d'envoi ; ce qui viole au moins :
+
+* Le https://fr.wikipedia.org/wiki/Principe_de_s%C3%A9gr%C3%A9gation_des_interfaces[principe de ségrégation des interfaces]`
+* Le https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique  [principe de responsabilité unique] (Car La class Document a maintenant 2 raisons de changer : le contexte _lettrage_ et le contexte _envoi_)
+
+Effet bonus : Quand on change `Facture` dans le cadre du contexte _lettrage_, on doit recompiler/relivrer aussi le contexte _envoi_.
+
+On veut alors *séparer la logique métier des structures sur lesquelles elle agit*.
+
+Pour y parvenir, on utilisait jusque-là 3 patterns :
+
+* Le https://en.wikipedia.org/wiki/Visitor_pattern#Sources_3[visitor pattern]footnote:["Today, to express ad-hoc polymorphic calculations like this we would use the cumbersome visitor pattern". source : https://openjdk.java.net/jeps/405]
+* Le https://en.wikipedia.org/wiki/Delegation_pattern[delegate pattern]
+* Le pattern service-everywhere avec des méthodes à 8 arguments (un anti-pattern d’après moi), qui nait de la programmation procédurale
+
+Mais à présent avec Java 17, une quatrième solution élégante s’offre à nous : Le Pattern Matching.
 
 == Qu’est-ce que le pattern matching ?
 
@@ -97,26 +167,107 @@ Là, les patterns à matcher sont des structures de données :
 * Des array
 * Et bien sûr des records !
 
-Je trouve que le cas du matching sur `instanceof` avec Type-Pattern est le plus facile à comprendre :
+Je trouve que le cas du matching sur `instanceof` avec Type-Pattern est le plus facile à comprendre. +
+Avant Java 17, on avait ça :
 
 [source,java]
 ----
-if (vehicle instanceof Car car) {
-  car.drive();
-} else if (vehicle instanceof Plane plane) {
-  plane.fly();
+if (facture instanceof FacturePayée) {
+	lettrageService.lettrer(((FacturePayée) facture));
+} else if (facture instanceof FactureDue) {
+	recouvrementService.relancer(((FactureDue) facture));
 }
 ----
 
-Ici le pattern à matcher est l’appartenance aux classes `Car` et `Plane`.
-On teste si l’instance a un des types, et une conversion implicite est faite vers une "binding variable" (`car` ou `plane`).
+Et à présent :
+
+[source,java]
+----
+if (facture instanceof FacturePayée facturePayée) {
+	lettrageService.lettrer(facturePayée);
+} else if (facture instanceof FactureDue factureDue) {
+	recouvrementService.relancer(factureDue);
+}
+----
+
+Ici le pattern à matcher est l’appartenance aux classes `FacturePayée` et `FactureDue`.
+On teste si l’instance a un des types, et une conversion implicite est faite vers une "binding variable" (`facturePayée` ou `factureDue`).
 
 == Comment le Pattern Matching remplace-t-il le visitor pattern ?
 
-//Des exemples furent promis, des exemples sont alors donnés.
-Exemples j'ai promis, exemples je donne.
+J’ai promis des exemples de code, les voici.
 
+Voici l'implémentation du visitor pattern avec le modèle de Facture :
 
+[source,java]
+----
+
+interface FactureVisitable {
+	default void accept(FactureVisitor factureVisitor) {
+		factureVisitor.visit(this);
+	}
+}
+
+abstract class Facture implements FactureVisitable {
+}
+
+class FacturePayée extends Facture {
+}
+
+class FactureDue extends Facture {
+}
+
+interface FactureVisitor {
+	void visit(FacturePayée facturePayée);
+
+	void visit(FactureDue factureDue);
+}
+
+interface ServiceLettrage {
+	void lettrer(FacturePayée facturePayée);
+}
+
+interface ServiceRecouvrement {
+	void relancer(FactureDue factureDue);
+}
+
+record MainFactureVisitor(ServiceLettrage serviceLettrage, ServiceRecouvrement serviceRecouvrement) implements FactureVisitor {
+
+	@Override
+	public void visit(FacturePayée facturePayée) {
+		serviceLettrage.lettrer(facturePayée);
+	}
+
+	@Override
+	public void visit(FactureDue factureDue) {
+		serviceRecouvrement.relancer(factureDue);
+	}
+}
+
+record FactureService(MainFactureVisitor mainFactureVisitor) {
+
+	public void traiterFacture(Facture facture) {
+		facture.accept(mainFactureVisitor);
+	}
+}
+
+----
+
+Et maintenant :
+
+[source,java]
+----
+record FactureService(MainFactureVisitor mainFactureVisitor) {
+
+	public void traiterFacture(Facture facture) {
+		if (facture instanceof FacturePayée facturePayée) {
+			lettrageService.lettrer(facturePayée);
+		} else if (facture instanceof FactureDue factureDue) {
+			recouvrementService.relancer(factureDue);
+		}
+	}
+}
+----
 
 == Qu’est-ce que la "déconstruction"
 
@@ -139,7 +290,7 @@ public record Product(
 ----
 
 Mais la règle métier que je veux appliquer ne porte que sur le `type` et le `price`.
-Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une déconstruction du Record "Product" :
+Je peux alors étendre le concept de `instanceof` précédent, en lui ajoutant une déconstruction du Record "Product" :
 
 [source,java]
 ----
@@ -211,7 +362,7 @@ Implémentons la sélection de la validation à appliquer à l’aide
 
 ----
 
-Implémentons la sélection de la validation à appliquer à l’aide d’un "Switch " on Pattern :
+Implémentons la sélection de la validation à appliquer à l’aide d’un "Switch on Pattern" :
 
 [source,java]
 ----
@@ -238,4 +389,4 @@ Plus de validation à la compile-time, et donc :
 * Pattern guards, Guarded Pattern
 * Sealed classes
 * Expressivité
-* le pattern matching permet de séparer la logique métier des entités sur lesquelles elle agit (Tout comme le pattern Visitor).
+* Le pattern matching permet de séparer la logique métier des entités sur lesquelles elle agit (Tout comme le pattern Visitor).
