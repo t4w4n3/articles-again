@@ -1,9 +1,10 @@
 = Java 17, le record & pattern matching c’est pour maintenant ?
 Antoine Salesse - a.salesse@younup.fr
-:toc:
+:toc: preamble
 :caution-caption: ⚠
-
-== Intro
+:tabsize: 2
+:source-highlighter: rouge
+:docinfo: private
 
 Promis juré, cet article n’est pas une liste des "nouvelles fonctionnalités de Java" (https://docs.oracle.com/javase/specs/jls/se17/html/index.html[JLS]footnote:[JLS : Java Language Specification] /
 https://stackoverflow.com/a/51286665[JSR]footnote:[JSR : Java Specification Request] / https://stackoverflow.com/a/51286665[JEP]footnote:[JEP : JDK Enhancement Proposal]).
@@ -37,20 +38,20 @@ Et avec bien sûr des exemples de code !
 Aujourd’hui le design de nos backend d’applications de gestions pousse (🌱) autour d’une problématique : +
 *Faire varier des comportements en fonction de cas d’usage*
 
-Dans ce genre d'applications, quelle que soit l'architecture choisie ou le style dev, on se retrouve à un moment ou un autre à :
+Dans ce genre d’applications, quelle que soit l’architecture choisie ou le style dev, on se retrouve à un moment ou un autre à :
 
 1.{nbsp}Modéliser notre domaine métier ::
 Cela peut être fait dans un package spécifique avec des POJO, ou avec des `Entity` JPA. +
-La seconde option est la plus répandue, mais ce n'est pas ma préférée.
-Je trouve que c'est une erreur de concevoir le business d'une application autour d'une base de données. +
+La seconde option est la plus répandue, mais ce n’est pas ma préférée.
+Je trouve que c’est une erreur de concevoir le business d’une application autour d’une base de données. +
 2.{nbsp}Écrire des DTO ::
-Dans l'idéal, un dto est immutable (Il n'y a aucune raison de changer la représentation d'une donnée transmise à un moment T). +
+Dans l’idéal, un dto est immutable (Il n’y a aucune raison de changer la représentation d’une donnée transmise à un moment T). +
 Le Record est la structure de données la plus appropriée. +
 Sinon, avant Java 14, on a les `@Value` de Lombok.
 
 Dans nos applications modulaires, on peut avoir envie de partager ces structures de données entre les modules :
 
-[plantuml,a,png]
+[plantuml,Modèle du domain Facture,png]
 ----
 @startuml
 allow_mixing
@@ -73,12 +74,12 @@ node "Module recouvrement" {
 ----
 
 Et bien pour faire varier les comportements des actions affectant ces classes, la POO nous incite à ajouter des méthodes sur nos classes de domaine. +
-//En effet, c'est un Objet, il a un état, et il peut porter des méthodes consommant ou modifiant cet état.
+//En effet, c’est un Objet, il a un état, et il peut porter des méthodes consommant ou modifiant cet état.
 
 Par exemple, pour la domain-class `Facture`, le module lettrage pourrait vouloir ajouter une méthode `calculerMontantRestantAPayer()`. +
 Le module envoie pourrait vouloir une méthode `getDestinataires()`.
 
-[plantuml,Modèle de domaine avec Facture et cas d'utilisation,png]
+[plantuml,Modèle de domaine avec Facture et cas d’utilisation,png]
 ----
 @startuml
 allow_mixing
@@ -96,13 +97,13 @@ node "Domain model" {
 }
 
 node "Module lettrage" {
-  usecase usecaseLettrage1
-  usecaseLettrage1 - Facture
+  usecase usecaseLettragePartiel
+  usecaseLettragePartiel - Facture
 }
 
 node "Module envoi" {
-  usecase usecaseEnvoi1
-  usecaseEnvoi1 - Facture
+  usecase usecasePremiereRelance
+  usecasePremiereRelance - Facture
 }
 
 @enduml
@@ -131,15 +132,15 @@ class Facture implements MontantCalculable, Envoyable {
 }
 ----
 
-Au bout d'un moment, notre domain-class `Facture` a beaucoup de méthodes issues de différents modules. +
-Le module lettrage utilise `Facture` et se retrouve à pouvoir appeler les méthodes du module d'envoi ; ce qui viole au moins :
+Au bout d’un moment, notre domain-class `Facture` a beaucoup de méthodes issues de différents modules. +
+Le module lettrage utilise `Facture` et se retrouve à pouvoir appeler les méthodes du module d’envoi ; ce qui viole au moins :
 
-* Le https://fr.wikipedia.org/wiki/Principe_de_s%C3%A9gr%C3%A9gation_des_interfaces[principe de ségrégation des interfaces]`
+* Le https://fr.wikipedia.org/wiki/Principe_de_s%C3%A9gr%C3%A9gation_des_interfaces[principe de ségrégation des interfaces]
 * Le https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique  [principe de responsabilité unique] (Car La class Document a maintenant 2 raisons de changer : le contexte _lettrage_ et le contexte _envoi_)
 
 Effet bonus : Quand on change `Facture` dans le cadre du contexte _lettrage_, on doit recompiler/relivrer aussi le contexte _envoi_.
 
-On veut alors *séparer la logique métier des structures sur lesquelles elle agit*.
+=== Solution : séparer la logique métier des structures sur lesquelles elle agit
 
 Pour y parvenir, on utilisait jusque-là 3 patterns :
 
@@ -149,7 +150,7 @@ Pour y parvenir, on utilisait jusque-là 3 patterns :
 
 Mais à présent avec Java 17, une quatrième solution élégante s’offre à nous : Le Pattern Matching.
 
-== Qu’est-ce que le pattern matching ?
+== Mais qu’est-ce que le pattern matching ?
 
 Je pense qu’on ne peut pas couper à la définition de Wikipédia :
 
@@ -172,9 +173,11 @@ Avant Java 17, on avait ça :
 
 [source,java]
 ----
-if (facture instanceof FacturePayée) {
+if (facture instanceof FacturePayée) { // Oui je mets des accents dans mon code français. La sémantique !
 	lettrageService.lettrer(((FacturePayée) facture));
-} else if (facture instanceof FactureDue) {
+	return;
+}
+if (facture instanceof FactureDue) {
 	recouvrementService.relancer(((FactureDue) facture));
 }
 ----
@@ -185,19 +188,21 @@ Et à présent :
 ----
 if (facture instanceof FacturePayée facturePayée) {
 	lettrageService.lettrer(facturePayée);
-} else if (facture instanceof FactureDue factureDue) {
+	return;
+}
+if (facture instanceof FactureDue factureDue) {
 	recouvrementService.relancer(factureDue);
 }
 ----
 
 Ici le pattern à matcher est l’appartenance aux classes `FacturePayée` et `FactureDue`.
-On teste si l’instance a un des types, et une conversion implicite est faite vers une "binding variable" (`facturePayée` ou `factureDue`).
+On teste si l’instance a un des types, et un cast implicite est fait vers une "binding variable" (`facturePayée` ou `factureDue`).
 
 == Comment le Pattern Matching remplace-t-il le visitor pattern ?
 
 J’ai promis des exemples de code, les voici.
 
-Voici l'implémentation du visitor pattern avec le modèle de Facture :
+Voici l’implémentation du visitor pattern avec le modèle de Facture :
 
 [source,java]
 ----
@@ -215,6 +220,15 @@ class FacturePayée extends Facture {
 }
 
 class FactureDue extends Facture {
+	private Integer nombreRelance = 0;
+
+	public void incrementerNombreRelance(){
+		nombreRelance++;
+	}
+
+	public boolean aDejaEteRelancée() {
+		return nombreRelance >= 1;
+	}
 }
 
 interface FactureVisitor {
@@ -244,7 +258,7 @@ record MainFactureVisitor(ServiceLettrage serviceLettrage, ServiceRecouvrement s
 	}
 }
 
-record FactureService(MainFactureVisitor mainFactureVisitor) {
+record FactureService(MainFactureVisitor mainFactureVisitor) implements TraitementFacture {
 
 	public void traiterFacture(Facture facture) {
 		facture.accept(mainFactureVisitor);
@@ -253,21 +267,155 @@ record FactureService(MainFactureVisitor mainFactureVisitor) {
 
 ----
 
+On observe que le rapport code utile/pure invention n’est pas excellent.
+
 Et maintenant :
 
 [source,java]
 ----
-record FactureService(MainFactureVisitor mainFactureVisitor) {
+record FactureService(LettrageService lettrageService, RecouvrementService recouvrementService) implements TraitementFacture {
 
 	public void traiterFacture(Facture facture) {
 		if (facture instanceof FacturePayée facturePayée) {
 			lettrageService.lettrer(facturePayée);
-		} else if (facture instanceof FactureDue factureDue) {
+			return;
+		}
+		if (facture instanceof FactureDue factureDue) {
 			recouvrementService.relancer(factureDue);
 		}
 	}
 }
 ----
+
+Le FactureService se suffit à lui-même, et la lisibilité me semble très acceptable.
+
+Mais avez-vous remarqué quelque chose dans ce dernier bout de code ?
+
+Le cas où `facture` est d’un autre type n’est pas géré ! +
+Et non, pas de `throw new NotImplementedException()` cette fois-ci. +
+
+C’est là que la fonctionnalité Java 15 de types scellés intervient. +
+Modifions un peu notre modèle :
+
+[source,java]
+----
+abstract sealed class Facture permits FacturePayée, FactureDue {
+}
+
+final class FacturePayée extends Facture {
+}
+
+final class FactureDue extends Facture {
+	private Integer nombreRelance = 0;
+
+	public void incrementerNombreRelance(){
+		nombreRelance++;
+	}
+
+	public boolean aDejaEteRelancée() {
+		return nombreRelance >= 1;
+	}
+}
+----
+
+Traduction en français : ::
+Il n’existe que 2 types de Facture possibles : FacturePayée et FactureDue. +
+Ces dernières ne peuvent être étendues. +
+Point.
+
+Cela donne donc :
+
+[source,java]
+----
+record FactureService(LettrageService lettrageService, RecouvrementService recouvrementService) implements TraitementFacture {
+
+	public void traiterFacture(Facture facture) {
+		switch (facture) {
+			case FacturePayée facturePayée -> lettrageService.lettrer(facturePayée);
+			// case FactureDue factureDue -> recouvrementService.relancer(factureDue);
+		}
+	}
+}
+----
+
+J’ai commenté le cas de la `FactureDue` afin d’observer ce que nous disent le compilateur et l’ide :
+
+image::java_the_switch_statement_does_not_cover_all_possible_input_values.png[alt="java: the switch statement does not cover all possible input values IntelliJ"]
+
+image::java_compile_error_java_17_the_switch_statement_does_not_cover_all_possible_input_values.png[alt="java compile error java 17 the switch statement does not cover all possible input values"]
+
+On doit alors déclarer le `Consumer<? extends Facture>` de tous les cas restants, ou bien les grouper dans un `default` :
+
+[source%linenums,java,highlight=6..7]
+----
+record FactureService(LettrageService lettrageService, RecouvrementService recouvrementService) implements TraitementFacture {
+
+	public void traiterFacture(Facture facture) {
+		switch (facture) {
+			case FacturePayée facturePayée -> lettrageService.lettrer(facturePayée);
+			// case FactureDue factureDue -> recouvrementService.relancer(factureDue);
+			default -> LOGGER.info("Cool y a rien à faire pour le cas là !");
+		}
+	}
+}
+----
+
+Avec cette syntaxe, le langage nous apporte une validation métier de plus à la compile time (soit plus tôt qu’à la runtime ou encore à la _prodtime_). +
+C’est les TDDistes qui sont contents.
+
+Et si on allait encore plus loin ? +
+Allez, ajoutons une feature preview de Java 17 : un "Guarded Pattern"
+
+[source%linenums,java,highlight=9..9]
+----
+record FactureService(
+		LettrageService lettrageService,
+		RecouvrementService recouvrementService)
+		implements TraitementFacture {
+
+	public void traiterFacture(Facture facture) {
+		switch (facture) {
+			case FacturePayée facturePayée -> lettrageService.lettrer(facturePayée);
+			case FactureDue factureDue && factureDue.aDéjàÉtéRelancée() -> recouvrementService.demarrerRecouvrement(factureDue);
+			case FactureDue factureDue -> recouvrementService.relancer(factureDue);
+		}
+	}
+}
+----
+
+Alors c'est très bien tout ça, mais l’objectif à terme du pattern matching va encore plus loin en ce qui concerne les records. +
+
+Reprenons notre exemple de `Facture`, mais considérons qu'elle vient d'arriver d'un `Controlleur` sour forme de DTO (et donc de record) :
+
+[source,java]
+----
+record Facture(String code, String libellé, Integer montant, ZonedDateTime dateCréation, ...){}
+----
+
+Je ne lui donne que quelques champs, mais considérons en plus qu'il y a en une vingtaine, une centaine, beaucoup...
+
+Quand je veux mapper cette facture vers un usecase, alors ce dernier n'a très certainement besoin que de seulement quelques-uns de ces champs. Le code suivant serait donc une erreur de design :
+
+[source%linenums,java,highlight=8..8]
+----
+@RestController
+class FactureControlleur {
+
+	@PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Long create(@RequestBody Facture facture) {
+        Preconditions.checkNotNull(facture);
+        notifierNouvelleFactureUseCase.handle(facture);
+		return factureService.handle(facture)
+    }
+}
+----
+
+On va pouvoir (Java >= 19) les déconstruire.
+
+/!\ On passe maintenant sur du code qu
+
+// todo : introduire un exemple qui justifie de décrire la d3construction
 
 == Qu’est-ce que la "déconstruction"
 
@@ -389,4 +537,3 @@ Plus de validation à la compile-time, et donc :
 * Pattern guards, Guarded Pattern
 * Sealed classes
 * Expressivité
-* Le pattern matching permet de séparer la logique métier des entités sur lesquelles elle agit (Tout comme le pattern Visitor).
