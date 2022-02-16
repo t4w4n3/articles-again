@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.16">
+<meta name="generator" content="Asciidoctor 2.0.17">
 <meta name="author" content="Antoine Salesse - a.salesse@younup.fr">
 <title>Java 17, le record &amp; pattern matching c’est pour maintenant ?</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
@@ -194,7 +194,8 @@ body.toc2.toc-right{padding-left:0;padding-right:20em}}
 #content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
 details,.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
 details{margin-left:1.25rem}
-details>summary{cursor:pointer;display:block;position:relative;line-height:1.6;margin-bottom:.625rem;-webkit-tap-highlight-color:transparent}
+details>summary{cursor:pointer;display:block;position:relative;line-height:1.6;margin-bottom:.625rem;outline:none;-webkit-tap-highlight-color:transparent}
+details>summary::-webkit-details-marker{display:none}
 details>summary::before{content:"";border:solid transparent;border-left:solid;border-width:.3em 0 .3em .5em;position:absolute;top:.5em;left:-1.25rem;transform:translateX(15%)}
 details[open]>summary::before{border:solid transparent;border-top:solid;border-width:.5em .3em 0;transform:translateY(15%)}
 details>summary::after{content:"";width:1.25rem;height:1em;position:absolute;top:.3em;left:-1.25rem}
@@ -236,9 +237,8 @@ pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
 table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
 table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
 table.linenotable td.code{padding-left:.75em}
-table.linenotable td.linenos{border-right:1px solid;opacity:.35;padding-right:.5em}
-pre.pygments .lineno{border-right:1px solid;opacity:.35;display:inline-block;margin-right:.75em}
-pre.pygments .lineno::before{content:"";margin-right:-.125em}
+table.linenotable td.linenos,pre.pygments .linenos{border-right:1px solid;opacity:.35;padding-right:.5em;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+pre.pygments span.linenos{display:inline-block;margin-right:.75em}
 .quoteblock{margin:0 1em 1.25em 1.5em;display:table}
 .quoteblock:not(.excerpt)>.title{margin-left:-1.5em;margin-bottom:.75em}
 .quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
@@ -275,7 +275,7 @@ table.frame-none>colgroup+*>:first-child>*,table.frame-sides>colgroup+*>:first-c
 table.frame-none>:last-child>:last-child>*,table.frame-sides>:last-child>:last-child>*{border-bottom-width:0}
 table.frame-none>*>tr>:first-child,table.frame-ends>*>tr>:first-child{border-left-width:0}
 table.frame-none>*>tr>:last-child,table.frame-ends>*>tr>:last-child{border-right-width:0}
-table.stripes-all tr,table.stripes-odd tr:nth-of-type(odd),table.stripes-even tr:nth-of-type(even),table.stripes-hover tr:hover{background:#f8f8f7}
+table.stripes-all>*>tr,table.stripes-odd>*>tr:nth-of-type(odd),table.stripes-even>*>tr:nth-of-type(even),table.stripes-hover>*>tr:hover{background:#f8f8f7}
 th.halign-left,td.halign-left{text-align:left}
 th.halign-right,td.halign-right{text-align:right}
 th.halign-center,td.halign-center{text-align:center}
@@ -291,10 +291,11 @@ ol{margin-left:1.75em}
 ul li ol{margin-left:1.5em}
 dl dd{margin-left:1.125em}
 dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
-ol>li p,ul>li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
+li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
 ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
 ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
 ul.unstyled,ol.unstyled{margin-left:0}
+li>p:empty:only-child::before{content:"";display:inline-block}
 ul.checklist>li>p:first-child{margin-left:-1em}
 ul.checklist>li>p:first-child>.fa-square-o:first-child,ul.checklist>li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
 ul.checklist>li>p:first-child>input[type=checkbox]:first-child{margin-right:.25em}
@@ -337,8 +338,6 @@ sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
 #footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none;margin-left:-1.05em}
 #footnotes .footnote:last-of-type{margin-bottom:0}
 #content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
-.gist .file-data>table{border:0;background:#fff;width:100%;margin-bottom:0}
-.gist .file-data>table td.line-data{width:99%}
 div.unbreakable{page-break-inside:avoid}
 .big{font-size:larger}
 .small{font-size:smaller}
@@ -437,6 +436,231 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge .cm {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cp {
+  color: #999999;
+  font-weight: bold;
+}
+pre.rouge .c1 {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cs {
+  color: #999999;
+  font-weight: bold;
+  font-style: italic;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cpf {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+}
+pre.rouge .gd {
+  color: #000000;
+  background-color: #ffdddd;
+}
+pre.rouge .ge {
+  color: #000000;
+  font-style: italic;
+}
+pre.rouge .gr {
+  color: #aa0000;
+}
+pre.rouge .gh {
+  color: #999999;
+}
+pre.rouge .gi {
+  color: #000000;
+  background-color: #ddffdd;
+}
+pre.rouge .go {
+  color: #888888;
+}
+pre.rouge .gp {
+  color: #555555;
+}
+pre.rouge .gs {
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #aaaaaa;
+}
+pre.rouge .gt {
+  color: #aa0000;
+}
+pre.rouge .kc {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kd {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kn {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kp {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kr {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kt {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .k, pre.rouge .kv {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .mf {
+  color: #009999;
+}
+pre.rouge .mh {
+  color: #009999;
+}
+pre.rouge .il {
+  color: #009999;
+}
+pre.rouge .mi {
+  color: #009999;
+}
+pre.rouge .mo {
+  color: #009999;
+}
+pre.rouge .m, pre.rouge .mb, pre.rouge .mx {
+  color: #009999;
+}
+pre.rouge .sa {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .sb {
+  color: #d14;
+}
+pre.rouge .sc {
+  color: #d14;
+}
+pre.rouge .sd {
+  color: #d14;
+}
+pre.rouge .s2 {
+  color: #d14;
+}
+pre.rouge .se {
+  color: #d14;
+}
+pre.rouge .sh {
+  color: #d14;
+}
+pre.rouge .si {
+  color: #d14;
+}
+pre.rouge .sx {
+  color: #d14;
+}
+pre.rouge .sr {
+  color: #009926;
+}
+pre.rouge .s1 {
+  color: #d14;
+}
+pre.rouge .ss {
+  color: #990073;
+}
+pre.rouge .s, pre.rouge .dl {
+  color: #d14;
+}
+pre.rouge .na {
+  color: #008080;
+}
+pre.rouge .bp {
+  color: #999999;
+}
+pre.rouge .nb {
+  color: #0086B3;
+}
+pre.rouge .nc {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .no {
+  color: #008080;
+}
+pre.rouge .nd {
+  color: #3c5d5d;
+  font-weight: bold;
+}
+pre.rouge .ni {
+  color: #800080;
+}
+pre.rouge .ne {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nl {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nn {
+  color: #555555;
+}
+pre.rouge .nt {
+  color: #000080;
+}
+pre.rouge .vc {
+  color: #008080;
+}
+pre.rouge .vg {
+  color: #008080;
+}
+pre.rouge .vi {
+  color: #008080;
+}
+pre.rouge .nv, pre.rouge .vm {
+  color: #008080;
+}
+pre.rouge .ow {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .o {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .w {
+  color: #bbbbbb;
+}
+pre.rouge {
+  background-color: #f8f8f8;
+}
+</style>
+<style>
+	pre.rouge .hll {
+		background-color: #ffc;
+	}
+	pre.rouge .hll * {
+		background-color: initial;
+	}
+</style>
+
+
 </head>
 <body class="article">
 <div id="header">
@@ -444,12 +668,76 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="details">
 <span id="author" class="author">Antoine Salesse - a.salesse@younup.fr</span><br>
 </div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Promis juré, cet article n’est pas une liste des "nouvelles fonctionnalités de Java" (<a href="https://docs.oracle.com/javase/specs/jls/se17/html/index.html">JLS</a><sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> /
+<a href="https://stackoverflow.com/a/51286665">JSR</a><sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> / <a href="https://stackoverflow.com/a/51286665">JEP</a><sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup>).</p>
+</div>
+<div class="paragraph">
+<p>Depuis sa sortie en septembre 2021, les articles sur Java <strong>17</strong> pleuvent.</p>
+</div>
+<div class="paragraph">
+<p>Ok, ça y est, on a bien compris que cette version est une <a href="https://stackoverflow.com/a/51286665">LTS</a><sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup>.</p>
+</div>
+<div class="paragraph">
+<p>Mais c’est aussi bien plus que cela.<br>
+C’est une milestone de l’objectif ambitieux nommé<br>
+<strong>"Record and Array Pattern Matching"</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Cet objectif est un ensemble de fonctionnalités synergiques :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Les <code>instanceof</code> avec "Type Patterns" (dispo en 16)</p>
+</li>
+<li>
+<p>Les Switch on Patterns (Java 17 preview, et probablement dispo en 19)</p>
+</li>
+<li>
+<p>La déconstruction de <code>record</code> (Peut-être Java 19 preview)</p>
+</li>
+<li>
+<p>La déconstruction d’array (Java 19+ ?)</p>
+</li>
+<li>
+<p>Les imbrications de patterns (pas de visibilité de dispo)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>C’est donc de ces features dont on parle ici :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>À quoi elles servent ?</p>
+</li>
+<li>
+<p>Comment et dans quels contextes les utiliser ?</p>
+</li>
+<li>
+<p>Qu’apportent-elles à notre code ?</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Et avec bien sûr des exemples de code !</p>
+</div>
+</div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_intro">Intro</a></li>
-<li><a href="#_les_applications_de_gestion_aujourdhui">Les applications de gestion aujourd’hui</a></li>
-<li><a href="#_quest_ce_que_le_pattern_matching">Qu’est-ce que le pattern matching ?</a></li>
+<li><a href="#_les_applications_de_gestion_aujourdhui">Les applications de gestion aujourd’hui</a>
+<ul class="sectlevel2">
+<li><a href="#_solution_séparer_la_logique_métier_des_structures_sur_lesquelles_elle_agit">Solution : séparer la logique métier des structures sur lesquelles elle agit</a></li>
+</ul>
+</li>
+<li><a href="#_mais_quest_ce_que_le_pattern_matching">Mais qu’est-ce que le pattern matching ?</a></li>
 <li><a href="#_comment_le_pattern_matching_remplace_t_il_le_visitor_pattern">Comment le Pattern Matching remplace-t-il le visitor pattern ?</a></li>
 <li><a href="#_quest_ce_que_la_déconstruction">Qu’est-ce que la "déconstruction"</a>
 <ul class="sectlevel2">
@@ -466,145 +754,118 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </div>
 </div>
-<div id="content">
-<div class="sect1">
-<h2 id="_intro">Intro</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Promis juré, cet article n’est pas une liste de <a href="https://docs.oracle.com/javase/specs/jls/se17/html/index.html">JLS</a><sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> / <a href="https://stackoverflow.com/a/51286665">JSR</a><sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> / <a href="https://stackoverflow.com/a/51286665">JEP</a><sup class="footnote">[<a id="_footnoteref_3" class="footnote" href="#_footnotedef_3" title="View footnote.">3</a>]</sup>.</p>
-</div>
-<div class="paragraph">
-<p>Depuis sa sortie en septembre 2021, les articles sur Java 17 pleuvent.</p>
-</div>
-<div class="paragraph">
-<p>Ça y est, on a bien compris que cette version est une <a href="https://stackoverflow.com/a/51286665">LTS</a><sup class="footnote">[<a id="_footnoteref_4" class="footnote" href="#_footnotedef_4" title="View footnote.">4</a>]</sup>.</p>
-</div>
-<div class="paragraph">
-<p>Mais c’est aussi bien plus que cela.
-C’est une milestone de l’objectif ambitieux nommé<br>
-<strong>"Record and Array Pattern Matching"</strong>.</p>
-</div>
-<div class="paragraph">
-<p>Cet objectif est un ensemble de fonctionnalités synergiques :</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Les <code>instanceof</code> avec "Type Patterns" (dispo en 16)</p>
-</li>
-<li>
-<p>Les Switch on Patterns (dispo en 17 preview)</p>
-</li>
-<li>
-<p>La déconstruction d’array (Peut-être dispo en 19 preview)</p>
-</li>
-<li>
-<p>La déconstruction de <code>record</code> (Peut-être dispo en 19 preview)</p>
-</li>
-<li>
-<p>Les imbrications de patterns (pas de visibilité de dispo)</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>C’est donc de ces features dont on parle ici :</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>À quoi elles servent ?</p>
-</li>
-<li>
-<p>Que vont-elles apporter à notre code ?</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Et avec bien sûr des exemples de code !</p>
-</div>
-</div>
-</div>
 <div class="sect1">
 <h2 id="_les_applications_de_gestion_aujourdhui">Les applications de gestion aujourd’hui</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Aujourd’hui le design de nos back-end d’applications de gestions pousse autour d’une problématique :<br>
+<p>Aujourd’hui le design de nos backend d’applications de gestions pousse (🌱) autour d’une problématique :<br>
 <strong>Faire varier des comportements en fonction de cas d’usage</strong></p>
 </div>
 <div class="paragraph">
-<p>Dans une application modulaire idéale, un module représente un contexte métier (<a href="https://martinfowler.com/bliki/BoundedContext.html">Bounded Context</a>).</p>
-</div>
-<div class="paragraph">
-<p>Illustrons cela avec 3 contextes :</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Customer</p>
-</li>
-<li>
-<p>Administrator</p>
-</li>
-<li>
-<p>Partner</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Tous les 3 manipulent le concept de <code>Document</code>.<br>
-On retrouve alors au moins 2 designs de partage de ce concept :</p>
+<p>Dans ce genre d’applications, quelle que soit l’architecture choisie ou le style dev, on se retrouve à un moment ou un autre à :</p>
 </div>
 <div class="dlist">
 <dl>
-<dt class="hdlist1">1.&#160;L’architecture hexagonale modulaire</dt>
+<dt class="hdlist1">1.&#160;Modéliser notre domaine métier </dt>
 <dd>
-<p>Elle peut prendre la forme d’un monolith modulaire, ou bien de microservices.<br>
-Chacun des modules/services possède un package <code>domain</code> où on modélise le domaine métier, dont <code>Document</code>.<br>
-Ils utilisent des mappers pour s’échanger le concept de <code>Document</code> à travers de <a href="https://en.wikipedia.org/wiki/Data_transfer_object">DTO</a>s, envoyés en http (microservices) ou en runtime (monolith modulaire).<br>
-Grace au découplage des contextes métiers, les méthodes des classes <code>Document</code> ne peuvent pas être appelées depuis les autres modules.<br>
-On peut alors se permettre de laisser <code>Document</code> responsable de la logique métier le concernant.</p>
+<p>Cela peut être fait dans un package spécifique avec des POJO, ou avec des <code>Entity</code> JPA.<br>
+La seconde option est la plus répandue, mais ce n’est pas ma préférée.
+Je trouve que c’est une erreur de concevoir le business d’une application autour d’une base de données.<br></p>
 </dd>
-<dt class="hdlist1">2.&#160;L’architecture monolithique</dt>
+<dt class="hdlist1">2.&#160;Écrire des DTO </dt>
 <dd>
-<p>Ici les contextes métiers n’ont pas été découverts et il n’y a alors pas de frontière découplante entre eux.<br>
-C’est acceptable pour une application raisonnablement complexe, dans laquelle il n’y a d&#8217;ailleurs peut-être même qu’un seul context métier.<br>
-On a toujours une classe <code>Document</code> dans un package <code>domain</code>.</p>
+<p>Dans l’idéal, un dto est immutable (Il n’y a aucune raison de changer la représentation d’une donnée transmise à un moment T).<br>
+Le Record est la structure de données la plus appropriée.<br>
+Sinon, avant Java 14, on a les <code>@Value</code> de Lombok.</p>
 </dd>
 </dl>
 </div>
 <div class="paragraph">
-<p>Dans le premier design, tout va bien, continuons à continuer ainsi &#8230;&#8203;</p>
+<p>Dans nos applications modulaires, on peut avoir envie de partager ces structures de données entre les modules :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="Modèle%20du%20domain%20Facture.png" alt="Modèle du domain Facture" width="757" height="116">
+</div>
 </div>
 <div class="paragraph">
-<p>Mais dans le deuxième, attention !</p>
+<p>Et bien pour faire varier les comportements des actions affectant ces classes, la POO nous incite à ajouter des méthodes sur nos classes de domaine.<br></p>
 </div>
 <div class="paragraph">
-<p>Si on met dans <code>Document</code> la logique métier agissant dessus, alors on couple fortement la totalité de l&#8217;application avec l&#8217;implémentation de <code>Document</code> !
-Cela impacte fortement la parallélisation, le scope (et donc la vitesse) de recompilation de l&#8217;application.</p>
+<p>Par exemple, pour la domain-class <code>Facture</code>, le module lettrage pourrait vouloir ajouter une méthode <code>calculerMontantRestantAPayer()</code>.<br>
+Le module envoie pourrait vouloir une méthode <code>getDestinataires()</code>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="Modèle%20de%20domaine%20avec%20Facture%20et%20cas%20d’utilisation.png" alt="Modèle de domaine avec Facture et cas d’utilisation" width="865" height="250">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">class</span> <span class="nc">Facture</span> <span class="kd">implements</span> <span class="nc">MontantCalculable</span><span class="o">,</span> <span class="nc">Envoyable</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="nc">String</span> <span class="n">libelle</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">CodeFacture</span> <span class="n">code</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">Client</span> <span class="n">client</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">Reçu</span> <span class="n">reçu</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">Devise</span> <span class="n">montant</span><span class="o">;</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="nc">Integer</span> <span class="nf">calculerMontantRestantAPayer</span><span class="o">(){</span>
+    <span class="o">...</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Personne</span><span class="o">&gt;</span> <span class="nf">getDestinataires</span><span class="o">(){</span>
+    <span class="o">...</span>
+  <span class="o">}</span>
+
+  <span class="o">...</span>
+<span class="o">}</span></code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>On veut alors <strong>séparer la logique métier des entités sur lesquelles elle agit</strong>.</p>
-</div>
-<div class="paragraph">
-<p>Pour y parvenir, on utilisait jusque-là 2 pattern :</p>
+<p>Au bout d’un moment, notre domain-class <code>Facture</code> a beaucoup de méthodes issues de différents modules.<br>
+Le module lettrage utilise <code>Facture</code> et se retrouve à pouvoir appeler les méthodes du module d’envoi ; ce qui viole au moins :</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>le <a href="https://en.wikipedia.org/wiki/Visitor_pattern#Sources_3">visitor pattern</a><sup class="footnote">[<a id="_footnoteref_5" class="footnote" href="#_footnotedef_5" title="View footnote.">5</a>]</sup></p>
+<p>Le <a href="https://fr.wikipedia.org/wiki/Principe_de_s%C3%A9gr%C3%A9gation_des_interfaces">principe de ségrégation des interfaces</a></p>
 </li>
 <li>
-<p>le everything-is-a-service avec des méthodes à 8 arguments (un anti-pattern d&#8217;après moi)</p>
+<p>Le <a href="https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique" class="bare">https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique</a>  [principe de responsabilité unique] (Car La class Document a maintenant 2 raisons de changer : le contexte <em>lettrage</em> et le contexte <em>envoi</em>)</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Mais à présent avec java 17, une troisième solution élégante s&#8217;offre à nous : Le Pattern Matching.</p>
+<p>Effet bonus : Quand on change <code>Facture</code> dans le cadre du contexte <em>lettrage</em>, on doit recompiler/relivrer aussi le contexte <em>envoi</em>.</p>
+</div>
+<div class="sect2">
+<h3 id="_solution_séparer_la_logique_métier_des_structures_sur_lesquelles_elle_agit">Solution : séparer la logique métier des structures sur lesquelles elle agit</h3>
+<div class="paragraph">
+<p>Pour y parvenir, on utilisait jusque-là 3 patterns :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Le <a href="https://en.wikipedia.org/wiki/Visitor_pattern#Sources_3">visitor pattern</a><sup class="footnote">[<a id="_footnoteref_5" class="footnote" href="#_footnotedef_5" title="View footnote.">5</a>]</sup></p>
+</li>
+<li>
+<p>Le <a href="https://en.wikipedia.org/wiki/Delegation_pattern">delegate pattern</a></p>
+</li>
+<li>
+<p>Le pattern service-everywhere avec des méthodes à 8 arguments (un anti-pattern d’après moi), qui nait de la programmation procédurale</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Mais à présent avec Java 17, une quatrième solution élégante s’offre à nous : Le Pattern Matching.</p>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_quest_ce_que_le_pattern_matching">Qu’est-ce que le pattern matching ?</h2>
+<h2 id="_mais_quest_ce_que_le_pattern_matching">Mais qu’est-ce que le pattern matching ?</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Je pense qu’on ne peut pas couper à la définition de Wikipédia :</p>
@@ -642,27 +903,276 @@ Cela impacte fortement la parallélisation, le scope (et donc la vitesse) de rec
 </ul>
 </div>
 <div class="paragraph">
-<p>Je trouve que le cas du matching sur <code>instanceof</code> avec Type-Pattern est le plus facile à comprendre :</p>
+<p>Je trouve que le cas du matching sur <code>instanceof</code> avec Type-Pattern est le plus facile à comprendre.<br>
+Avant Java 17, on avait ça :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#080;font-weight:bold">if</span> (vehicle <span style="color:#080;font-weight:bold">instanceof</span> Car car) {
-  car.drive();
-} <span style="color:#080;font-weight:bold">else</span> <span style="color:#080;font-weight:bold">if</span> (vehicle <span style="color:#080;font-weight:bold">instanceof</span> Plane plane) {
-  plane.fly();
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FacturePayée</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// Oui je mets des accents dans mon code français. La sémantique !</span>
+  <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(((</span><span class="nc">FacturePayée</span><span class="o">)</span> <span class="n">facture</span><span class="o">));</span>
+  <span class="k">return</span><span class="o">;</span>
+<span class="o">}</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FactureDue</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">recouvrementService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(((</span><span class="nc">FactureDue</span><span class="o">)</span> <span class="n">facture</span><span class="o">));</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Ici le pattern à matcher est l’appartenance aux classes <code>Car</code> et <code>Plane</code>.
-On teste si l’instance a un des types, et une conversion implicite est faite vers une "binding variable" (<code>car</code> ou <code>plane</code>).</p>
+<p>Et à présent :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FacturePayée</span> <span class="n">facturePayée</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
+  <span class="k">return</span><span class="o">;</span>
+<span class="o">}</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FactureDue</span> <span class="n">factureDue</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">recouvrementService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">factureDue</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ici le pattern à matcher est l’appartenance aux classes <code>FacturePayée</code> et <code>FactureDue</code>.
+On teste si l’instance a un des types, et un cast implicite est fait vers une "binding variable" (<code>facturePayée</code> ou <code>factureDue</code>).</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_comment_le_pattern_matching_remplace_t_il_le_visitor_pattern">Comment le Pattern Matching remplace-t-il le visitor pattern ?</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>J’ai promis des exemples de code, les voici.</p>
+</div>
+<div class="paragraph">
+<p>Voici l’implémentation du visitor pattern avec le modèle de Facture :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">interface</span> <span class="nc">FactureVisitable</span> <span class="o">{</span>
+  <span class="k">default</span> <span class="kt">void</span> <span class="nf">accept</span><span class="o">(</span><span class="nc">FactureVisitor</span> <span class="n">factureVisitor</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">factureVisitor</span><span class="o">.</span><span class="na">visit</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
 
+<span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">Facture</span> <span class="kd">implements</span> <span class="nc">FactureVisitable</span> <span class="o">{</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">FacturePayée</span> <span class="kd">extends</span> <span class="nc">Facture</span> <span class="o">{</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">FactureDue</span> <span class="kd">extends</span> <span class="nc">Facture</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="nc">Integer</span> <span class="n">nombreRelance</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">incrementerNombreRelance</span><span class="o">(){</span>
+    <span class="n">nombreRelance</span><span class="o">++;</span>
+  <span class="o">}</span>
+
+  <span class="kd">public</span> <span class="kt">boolean</span> <span class="n">aDejaEteRelancée</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">nombreRelance</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">interface</span> <span class="nc">FactureVisitor</span> <span class="o">{</span>
+  <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">FacturePayée</span> <span class="n">facturePayée</span><span class="o">);</span>
+
+  <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">FactureDue</span> <span class="n">factureDue</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="kd">interface</span> <span class="nc">ServiceLettrage</span> <span class="o">{</span>
+  <span class="kt">void</span> <span class="nf">lettrer</span><span class="o">(</span><span class="nc">FacturePayée</span> <span class="n">facturePayée</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="kd">interface</span> <span class="nc">ServiceRecouvrement</span> <span class="o">{</span>
+  <span class="kt">void</span> <span class="nf">relancer</span><span class="o">(</span><span class="nc">FactureDue</span> <span class="n">factureDue</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="n">record</span> <span class="nf">MainFactureVisitor</span><span class="o">(</span><span class="nc">ServiceLettrage</span> <span class="n">serviceLettrage</span><span class="o">,</span> <span class="nc">ServiceRecouvrement</span> <span class="n">serviceRecouvrement</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">FactureVisitor</span> <span class="o">{</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">FacturePayée</span> <span class="n">facturePayée</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">serviceLettrage</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">FactureDue</span> <span class="n">factureDue</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">serviceRecouvrement</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">factureDue</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="n">record</span> <span class="nf">FactureService</span><span class="o">(</span><span class="nc">MainFactureVisitor</span> <span class="n">mainFactureVisitor</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">TraitementFacture</span> <span class="o">{</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterFacture</span><span class="o">(</span><span class="nc">Facture</span> <span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">facture</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">mainFactureVisitor</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On observe que le rapport code utile/pure invention n’est pas excellent.</p>
+</div>
+<div class="paragraph">
+<p>Et maintenant :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">record</span> <span class="nf">FactureService</span><span class="o">(</span><span class="nc">LettrageService</span> <span class="n">lettrageService</span><span class="o">,</span> <span class="nc">RecouvrementService</span> <span class="n">recouvrementService</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">TraitementFacture</span> <span class="o">{</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterFacture</span><span class="o">(</span><span class="nc">Facture</span> <span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FacturePayée</span> <span class="n">facturePayée</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
+      <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FactureDue</span> <span class="n">factureDue</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">recouvrementService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">factureDue</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Le FactureService se suffit à lui-même, et la lisibilité me semble très acceptable.</p>
+</div>
+<div class="paragraph">
+<p>Mais avez-vous remarqué quelque chose dans ce dernier bout de code ?</p>
+</div>
+<div class="paragraph">
+<p>Le cas où <code>facture</code> est d’un autre type n’est pas géré !<br>
+Et non, pas de <code>throw new NotImplementedException()</code> cette fois-ci.<br></p>
+</div>
+<div class="paragraph">
+<p>C’est là que la fonctionnalité Java 15 de types scellés intervient.<br>
+Modifions un peu notre modèle :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">abstract</span> <span class="n">sealed</span> <span class="kd">class</span> <span class="nc">Facture</span> <span class="n">permits</span> <span class="nc">FacturePayée</span><span class="o">,</span> <span class="nc">FactureDue</span> <span class="o">{</span>
+<span class="o">}</span>
+
+<span class="kd">final</span> <span class="kd">class</span> <span class="nc">FacturePayée</span> <span class="kd">extends</span> <span class="nc">Facture</span> <span class="o">{</span>
+<span class="o">}</span>
+
+<span class="kd">final</span> <span class="kd">class</span> <span class="nc">FactureDue</span> <span class="kd">extends</span> <span class="nc">Facture</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="nc">Integer</span> <span class="n">nombreRelance</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">incrementerNombreRelance</span><span class="o">(){</span>
+    <span class="n">nombreRelance</span><span class="o">++;</span>
+  <span class="o">}</span>
+
+  <span class="kd">public</span> <span class="kt">boolean</span> <span class="n">aDejaEteRelancée</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">nombreRelance</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Traduction en français : </dt>
+<dd>
+<p>Il n’existe que 2 types de Facture possibles : FacturePayée et FactureDue.<br>
+Ces dernières ne peuvent être étendues.<br>
+Point.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Cela donne donc :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">record</span> <span class="nf">FactureService</span><span class="o">(</span><span class="nc">LettrageService</span> <span class="n">lettrageService</span><span class="o">,</span> <span class="nc">RecouvrementService</span> <span class="n">recouvrementService</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">TraitementFacture</span> <span class="o">{</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterFacture</span><span class="o">(</span><span class="nc">Facture</span> <span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">FacturePayée</span> <span class="n">facturePayée</span> <span class="o">-&gt;</span> <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
+      <span class="c1">// case FactureDue factureDue -&gt; recouvrementService.relancer(factureDue);</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>J’ai commenté le cas de la <code>FactureDue</code> afin d’observer ce que nous disent le compilateur et l’ide :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="java_the_switch_statement_does_not_cover_all_possible_input_values.png" alt="java: the switch statement does not cover all possible input values IntelliJ">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="java_compile_error_java_17_the_switch_statement_does_not_cover_all_possible_input_values.png" alt="java compile error java 17 the switch statement does not cover all possible input values">
+</div>
+</div>
+<div class="paragraph">
+<p>On doit alors déclarer le <code>Consumer&lt;? extends Facture&gt;</code> de tous les cas restants, ou bien les grouper dans un <code>default</code> :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><table class="linenotable"><tbody><tr><td class="linenos gl"><pre class="lineno"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+</pre></td><td class="code"><pre><span class="n">record</span> <span class="nf">FactureService</span><span class="o">(</span><span class="nc">LettrageService</span> <span class="n">lettrageService</span><span class="o">,</span> <span class="nc">RecouvrementService</span> <span class="n">recouvrementService</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">TraitementFacture</span> <span class="o">{</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterFacture</span><span class="o">(</span><span class="nc">Facture</span> <span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">FacturePayée</span> <span class="n">facturePayée</span> <span class="o">-&gt;</span> <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
+<span class="hll">      <span class="c1">// case FactureDue factureDue -&gt; recouvrementService.relancer(factureDue);</span>
+</span><span class="hll">      <span class="k">default</span> <span class="o">-&gt;</span> <span class="no">LOGGER</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Cool y a rien à faire pour le cas là !"</span><span class="o">);</span>
+</span>    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Avec cette syntaxe, le langage nous apporte une validation métier de plus à la compile time (soit plus tôt qu’à la runtime ou encore à la <em>prodtime</em>).<br>
+C’est les TDDistes qui sont contents.</p>
+</div>
+<div class="paragraph">
+<p>Alors très bien, mais l’objectif à terme du pattern matching va encore plus loin.<br>
+On va pouvoir (Java &gt;= 19),</p>
+</div>
+<div class="paragraph">
+<p>/!\ On passe maintenant sur du code qu</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><table class="linenotable"><tbody><tr><td class="linenos gl"><pre class="lineno"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+</pre></td><td class="code"><pre><span class="n">record</span> <span class="nf">FactureService</span><span class="o">(</span>
+    <span class="nc">LettrageService</span> <span class="n">lettrageService</span><span class="o">,</span>
+    <span class="nc">RecouvrementService</span> <span class="n">recouvrementService</span><span class="o">)</span>
+    <span class="kd">implements</span> <span class="nc">TraitementFacture</span> <span class="o">{</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterFacture</span><span class="o">(</span><span class="nc">Facture</span> <span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">FacturePayée</span> <span class="n">facturePayée</span> <span class="o">-&gt;</span> <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
+<span class="hll">      <span class="k">case</span> <span class="nc">FactureDue</span> <span class="n">factureDue</span> <span class="o">&amp;&amp;</span> <span class="n">factureDue</span><span class="o">.</span><span class="na">aDejaÉtéRelancée</span><span class="o">()</span> <span class="o">-&gt;</span> <span class="n">recouvrementService</span><span class="o">.</span><span class="na">demarrerRecouvrement</span><span class="o">(</span><span class="n">factureDue</span><span class="o">);</span>
+</span>      <span class="k">case</span> <span class="nc">FactureDue</span> <span class="n">factureDue</span> <span class="o">-&gt;</span> <span class="n">recouvrementService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">factureDue</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table></code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -682,23 +1192,23 @@ On teste si l’instance a un des types, et une conversion implicite est faite v
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#088;font-weight:bold">public</span> record Product(
-  <span style="color:#0a8;font-weight:bold">String</span> type,
-  <span style="color:#0a8;font-weight:bold">String</span> price,
-  <span style="color:#0a8;font-weight:bold">String</span> name,
-  <span style="color:#777">// imaginez ici 39 autres champs</span>
-){}</code></pre>
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="n">record</span> <span class="nf">Product</span><span class="o">(</span>
+  <span class="nc">String</span> <span class="n">type</span><span class="o">,</span>
+  <span class="nc">String</span> <span class="n">price</span><span class="o">,</span>
+  <span class="nc">String</span> <span class="n">name</span><span class="o">,</span>
+  <span class="c1">// imaginez ici 39 autres champs</span>
+<span class="o">){}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Mais la règle métier que je veux appliquer ne porte que sur le <code>type</code> et le <code>price</code>.
-Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une déconstruction du Record "Product" :</p>
+Je peux alors étendre le concept de <code>instanceof</code> précédent, en lui ajoutant une déconstruction du Record "Product" :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#080;font-weight:bold">if</span> (object <span style="color:#080;font-weight:bold">instanceof</span> Product(<span style="color:#0a8;font-weight:bold">String</span> type, <span style="color:#0a8;font-weight:bold">String</span> price)) {
-  myUseCase.execute(type, price);
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">object</span> <span class="k">instanceof</span> <span class="nf">Product</span><span class="o">(</span><span class="nc">String</span> <span class="n">type</span><span class="o">,</span> <span class="nc">String</span> <span class="n">price</span><span class="o">))</span> <span class="o">{</span>
+  <span class="n">myUseCase</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">type</span><span class="o">,</span> <span class="n">price</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -717,20 +1227,20 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#080;font-weight:bold">if</span> (vehicle <span style="color:#080;font-weight:bold">instanceof</span> Car) {
-  ((Car) vehicle).drive();
-} <span style="color:#080;font-weight:bold">else</span> <span style="color:#080;font-weight:bold">if</span> (vehicle <span style="color:#080;font-weight:bold">instanceof</span> Plane) {
-  ((Plane) vehicle).fly();
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">vehicle</span> <span class="k">instanceof</span> <span class="nc">Car</span><span class="o">)</span> <span class="o">{</span>
+  <span class="o">((</span><span class="nc">Car</span><span class="o">)</span> <span class="n">vehicle</span><span class="o">).</span><span class="na">drive</span><span class="o">();</span>
+<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">vehicle</span> <span class="k">instanceof</span> <span class="nc">Plane</span><span class="o">)</span> <span class="o">{</span>
+  <span class="o">((</span><span class="nc">Plane</span><span class="o">)</span> <span class="n">vehicle</span><span class="o">).</span><span class="na">fly</span><span class="o">();</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#080;font-weight:bold">if</span> (object <span style="color:#080;font-weight:bold">instanceof</span> Product) {
-  <span style="color:#0a8;font-weight:bold">String</span> type = ((Product) object).type;
-  <span style="color:#0a8;font-weight:bold">String</span> price = ((Product) object).price;
-  myUseCase.execute(type, price);
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">object</span> <span class="k">instanceof</span> <span class="nc">Product</span><span class="o">)</span> <span class="o">{</span>
+  <span class="nc">String</span> <span class="n">type</span> <span class="o">=</span> <span class="o">((</span><span class="nc">Product</span><span class="o">)</span> <span class="n">object</span><span class="o">).</span><span class="na">type</span><span class="o">;</span>
+  <span class="nc">String</span> <span class="n">price</span> <span class="o">=</span> <span class="o">((</span><span class="nc">Product</span><span class="o">)</span> <span class="n">object</span><span class="o">).</span><span class="na">price</span><span class="o">;</span>
+  <span class="n">myUseCase</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">type</span><span class="o">,</span> <span class="n">price</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -741,9 +1251,9 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#088;font-weight:bold">public</span> sealed <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">Document</span> permits Invoice, Contract {}
-<span style="color:#088;font-weight:bold">public</span> record Invoice(<span style="color:#339;font-weight:bold">int</span> amount, <span style="color:#0a8;font-weight:bold">String</span> buyer, <span style="color:#0a8;font-weight:bold">String</span> Seller) <span style="color:#088;font-weight:bold">implements</span> <span style="color:#0a8;font-weight:bold">Document</span> {}
-<span style="color:#088;font-weight:bold">public</span> record Contract(<span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; parties, <span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; formalities, <span style="color:#0a8;font-weight:bold">List</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>&gt; terms) <span style="color:#088;font-weight:bold">implements</span> <span style="color:#0a8;font-weight:bold">Document</span> {}</code></pre>
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="n">sealed</span> <span class="kd">interface</span> <span class="nc">Document</span> <span class="n">permits</span> <span class="nc">Invoice</span><span class="o">,</span> <span class="nc">Contract</span> <span class="o">{}</span>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">Invoice</span><span class="o">(</span><span class="kt">int</span> <span class="n">amount</span><span class="o">,</span> <span class="nc">String</span> <span class="n">buyer</span><span class="o">,</span> <span class="nc">String</span> <span class="nc">Seller</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">Document</span> <span class="o">{}</span>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">Contract</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">parties</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">formalities</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">terms</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">Document</span> <span class="o">{}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -779,15 +1289,15 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"></code></pre>
+<pre class="rouge highlight"><code data-lang="java"></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Implémentons la sélection de la validation à appliquer à l’aide d’un "Switch " on Pattern :</p>
+<p>Implémentons la sélection de la validation à appliquer à l’aide d’un "Switch on Pattern" :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"></code></pre>
+<pre class="rouge highlight"><code data-lang="java"></code></pre>
 </div>
 </div>
 </div>
@@ -847,9 +1357,6 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 <li>
 <p>Expressivité</p>
 </li>
-<li>
-<p>le pattern matching permet de séparer la logique métier des entités sur lesquelles elle agit (Tout comme le pattern Visitor).</p>
-</li>
 </ul>
 </div>
 </div>
@@ -870,12 +1377,12 @@ Je peux alors étendre le concept de instanceof précédent, en lui ajoutant une
 <a href="#_footnoteref_4">4</a>. LTS : Long Term Support
 </div>
 <div class="footnote" id="_footnotedef_5">
-<a href="#_footnoteref_5">5</a>. Today, to express ad-hoc polymorphic calculations like this we would use the cumbersome visitor pattern. source : <a href="https://openjdk.java.net/jeps/405" class="bare">https://openjdk.java.net/jeps/405</a>
+<a href="#_footnoteref_5">5</a>. "Today, to express ad-hoc polymorphic calculations like this we would use the cumbersome visitor pattern". source : <a href="https://openjdk.java.net/jeps/405" class="bare">https://openjdk.java.net/jeps/405</a>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-01-03 16:27:10 +0100
+Last updated 2022-02-09 15:32:59 +0100
 </div>
 </div>
 </body>

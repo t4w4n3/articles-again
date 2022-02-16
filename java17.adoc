@@ -136,7 +136,7 @@ Au bout d’un moment, notre domain-class `Facture` a beaucoup de méthodes issu
 Le module lettrage utilise `Facture` et se retrouve à pouvoir appeler les méthodes du module d’envoi ; ce qui viole au moins :
 
 * Le https://fr.wikipedia.org/wiki/Principe_de_s%C3%A9gr%C3%A9gation_des_interfaces[principe de ségrégation des interfaces]
-* Le https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique  [principe de responsabilité unique] (Car La class Document a maintenant 2 raisons de changer : le contexte _lettrage_ et le contexte _envoi_)
+* Le https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique[principe de responsabilité unique] (Car la classe Document a maintenant 2 raisons de changer : le contexte _lettrage_ et le contexte _envoi_)
 
 Effet bonus : Quand on change `Facture` dans le cadre du contexte _lettrage_, on doit recompiler/relivrer aussi le contexte _envoi_.
 
