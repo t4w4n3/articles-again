@@ -750,7 +750,6 @@ C’est une milestone de l’objectif ambitieux nommé<br>
 </ul>
 </li>
 <li><a href="#_conclusion">Conclusion</a></li>
-<li><a href="#_brainstorm_area">brainstorm area</a></li>
 </ul>
 </div>
 </div>
@@ -772,50 +771,51 @@ C’est une milestone de l’objectif ambitieux nommé<br>
 La seconde option est la plus répandue, mais ce n’est pas ma préférée.
 Je trouve que c’est une erreur de concevoir le business d’une application autour d’une base de données.<br></p>
 </dd>
-<dt class="hdlist1">2.&#160;Écrire des DTO </dt>
+<dt class="hdlist1">2.&#160;Écrire des <a href="https://en.wikipedia.org/wiki/Data_transfer_object">DTO</a> </dt>
 <dd>
 <p>Dans l’idéal, un dto est immutable (Il n’y a aucune raison de changer la représentation d’une donnée transmise à un moment T).<br>
-Le Record est la structure de données la plus appropriée.<br>
-Sinon, avant Java 14, on a les <code>@Value</code> de Lombok.</p>
+Le <code>record</code> est la structure de données la plus appropriée.<br>
+Sinon, avant Java 14, on a les <code>@Value</code> de Lombok.<br>
+On peut aussi se contenter de POJO mutables.</p>
 </dd>
 </dl>
 </div>
 <div class="paragraph">
 <p>Dans nos applications modulaires, on peut avoir envie de partager ces structures de données entre les modules :</p>
 </div>
-<div class="imageblock">
+<div class="imageblock kroki">
 <div class="content">
-<img src="Modèle%20du%20domain%20Facture.png" alt="Modèle du domain Facture" width="757" height="116">
+<img src="https://kroki.io/plantuml/png/eNp1j80KwkAMhM_dpwi9-w49eBEUii8gy3aQQDaB_amK-O4uRYVCPYXMTL4hQy4-lRrFeRG7XSLfWa_OqU2gfm_Rs1Jsi_T0dF0QnzMddDYOcK9v7mRTFZCgFKQlWDOCz6DPPC7O2KoY8nNXKu3-chOCzUiPLfKYEBkJZ4jXdttt62v6AJ3az2_6F1jy" alt="Modèle du domain Invoice">
 </div>
 </div>
 <div class="paragraph">
 <p>Et bien pour faire varier les comportements des actions affectant ces classes, la POO nous incite à ajouter des méthodes sur nos classes de domaine.<br></p>
 </div>
 <div class="paragraph">
-<p>Par exemple, pour la domain-class <code>Facture</code>, le module lettrage pourrait vouloir ajouter une méthode <code>calculerMontantRestantAPayer()</code>.<br>
-Le module envoie pourrait vouloir une méthode <code>getDestinataires()</code>.</p>
+<p>Par exemple, pour la domain-class <code>Invoice</code>, le module letter pourrait vouloir ajouter une méthode <code>calculateRemainingAmountToPay()</code>.<br>
+Le module envoie pourrait vouloir une méthode <code>getRecipients()</code>.</p>
 </div>
-<div class="imageblock">
+<div class="imageblock kroki">
 <div class="content">
-<img src="Modèle%20de%20domaine%20avec%20Facture%20et%20cas%20d’utilisation.png" alt="Modèle de domaine avec Facture et cas d’utilisation" width="865" height="250">
+<img src="https://kroki.io/plantuml/png/eNptUcFKAzEQPW--YuhJQf9ApKIeChWW4l1i9rkMTCYlydoW6b87a1nLVi9JZt6bN28my1J9rkMU50XS7i3ynrV3TlMHWjyl6FkpWiAL-nLONUF8KbTSz8QBxHEriNBa6CGmQeujlzCIfxfc0LORDuPTKpuVVvTIFE6Eig1GbWt2KnxNrT9cXbtmzaXetcglqeKeetQNAm95bGI40dHZwSaXP7xZuOw7A38tuOM000vqBrMkqEYahyIaCoIvmO71D9TaXhhyhmdpup128EcZY_5f4TYjMrKNLl4DzoQLYC6-hHb2Qd_BNJU3" alt="Modèle de domaine avec Invoice et cas d’utilisation">
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="kd">class</span> <span class="nc">Facture</span> <span class="kd">implements</span> <span class="nc">MontantCalculable</span><span class="o">,</span> <span class="nc">Envoyable</span> <span class="o">{</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">class</span> <span class="nc">Invoice</span> <span class="kd">implements</span> <span class="nc">AmountCalculable</span><span class="o">,</span> <span class="nc">Envoyable</span> <span class="o">{</span>
   <span class="kd">private</span> <span class="nc">String</span> <span class="n">libelle</span><span class="o">;</span>
-  <span class="kd">private</span> <span class="nc">CodeFacture</span> <span class="n">code</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">CodeInvoice</span> <span class="n">code</span><span class="o">;</span>
   <span class="kd">private</span> <span class="nc">Client</span> <span class="n">client</span><span class="o">;</span>
-  <span class="kd">private</span> <span class="nc">Reçu</span> <span class="n">reçu</span><span class="o">;</span>
-  <span class="kd">private</span> <span class="nc">Devise</span> <span class="n">montant</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">Receipt</span> <span class="n">receipt</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">Devise</span> <span class="n">amount</span><span class="o">;</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="nc">Integer</span> <span class="nf">calculerMontantRestantAPayer</span><span class="o">(){</span>
+  <span class="kd">public</span> <span class="nc">Integer</span> <span class="nf">calculateRemainingAmountToPay</span><span class="o">(){</span>
     <span class="o">...</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Personne</span><span class="o">&gt;</span> <span class="nf">getDestinataires</span><span class="o">(){</span>
+  <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Personne</span><span class="o">&gt;</span> <span class="nf">getRecipients</span><span class="o">(){</span>
     <span class="o">...</span>
   <span class="o">}</span>
 
@@ -824,8 +824,8 @@ Le module envoie pourrait vouloir une méthode <code>getDestinataires()</code>.<
 </div>
 </div>
 <div class="paragraph">
-<p>Au bout d’un moment, notre domain-class <code>Facture</code> a beaucoup de méthodes issues de différents modules.<br>
-Le module lettrage utilise <code>Facture</code> et se retrouve à pouvoir appeler les méthodes du module d’envoi ; ce qui viole au moins :</p>
+<p>Au bout d’un moment, notre domain-class <code>Invoice</code> a beaucoup de méthodes issues de différents modules.<br>
+Le module letter utilise <code>Invoice</code> et se retrouve à pouvoir appeler les méthodes du module d’envoi ; ce qui viole au moins :</p>
 </div>
 <div class="ulist">
 <ul>
@@ -833,12 +833,12 @@ Le module lettrage utilise <code>Facture</code> et se retrouve à pouvoir appele
 <p>Le <a href="https://fr.wikipedia.org/wiki/Principe_de_s%C3%A9gr%C3%A9gation_des_interfaces">principe de ségrégation des interfaces</a></p>
 </li>
 <li>
-<p>Le <a href="https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique" class="bare">https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique</a>  [principe de responsabilité unique] (Car La class Document a maintenant 2 raisons de changer : le contexte <em>lettrage</em> et le contexte <em>envoi</em>)</p>
+<p>Le <a href="https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique">principe de responsabilité unique</a> (Car la classe Document a maintenant 2 raisons de changer : le contexte <em>letter</em> et le contexte <em>envoi</em>)</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Effet bonus : Quand on change <code>Facture</code> dans le cadre du contexte <em>lettrage</em>, on doit recompiler/relivrer aussi le contexte <em>envoi</em>.</p>
+<p>Effet bonus : Quand on change <code>Invoice</code> dans le cadre du contexte <em>letter</em>, on doit recompiler/relivrer aussi le contexte <em>envoi</em>.</p>
 </div>
 <div class="sect2">
 <h3 id="_solution_séparer_la_logique_métier_des_structures_sur_lesquelles_elle_agit">Solution : séparer la logique métier des structures sur lesquelles elle agit</h3>
@@ -908,12 +908,12 @@ Avant Java 17, on avait ça :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FacturePayée</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// Oui je mets des accents dans mon code français. La sémantique !</span>
-  <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(((</span><span class="nc">FacturePayée</span><span class="o">)</span> <span class="n">facture</span><span class="o">));</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">invoice</span> <span class="k">instanceof</span> <span class="nc">PaidInvoice</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// Oui je mets des accents dans mon code français. La sémantique !</span>
+  <span class="n">letterService</span><span class="o">.</span><span class="na">letter</span><span class="o">(((</span><span class="nc">PaidInvoice</span><span class="o">)</span> <span class="n">invoice</span><span class="o">));</span>
   <span class="k">return</span><span class="o">;</span>
 <span class="o">}</span>
-<span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FactureDue</span><span class="o">)</span> <span class="o">{</span>
-  <span class="n">recouvrementService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(((</span><span class="nc">FactureDue</span><span class="o">)</span> <span class="n">facture</span><span class="o">));</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">invoice</span> <span class="k">instanceof</span> <span class="nc">DueInvoice</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">recoveryService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(((</span><span class="nc">DueInvoice</span><span class="o">)</span> <span class="n">invoice</span><span class="o">));</span>
 <span class="o">}</span></code></pre>
 </div>
 </div>
@@ -922,18 +922,18 @@ Avant Java 17, on avait ça :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FacturePayée</span> <span class="n">facturePayée</span><span class="o">)</span> <span class="o">{</span>
-  <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">invoice</span> <span class="k">instanceof</span> <span class="nc">PaidInvoice</span> <span class="n">paidInvoice</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">letterService</span><span class="o">.</span><span class="na">letter</span><span class="o">(</span><span class="n">paidInvoice</span><span class="o">);</span>
   <span class="k">return</span><span class="o">;</span>
 <span class="o">}</span>
-<span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FactureDue</span> <span class="n">factureDue</span><span class="o">)</span> <span class="o">{</span>
-  <span class="n">recouvrementService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">factureDue</span><span class="o">);</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">invoice</span> <span class="k">instanceof</span> <span class="nc">DueInvoice</span> <span class="n">dueInvoice</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">recoveryService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">dueInvoice</span><span class="o">);</span>
 <span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Ici le pattern à matcher est l’appartenance aux classes <code>FacturePayée</code> et <code>FactureDue</code>.
-On teste si l’instance a un des types, et un cast implicite est fait vers une "binding variable" (<code>facturePayée</code> ou <code>factureDue</code>).</p>
+<p>Ici le pattern à matcher est l’appartenance aux classes <code>PaidInvoice</code> et <code>DueInvoice</code>.
+On teste si l’instance a un des types, et un cast implicite est fait vers une "binding variable" (<code>paidInvoice</code> ou <code>dueInvoice</code>).</p>
 </div>
 </div>
 </div>
@@ -944,99 +944,99 @@ On teste si l’instance a un des types, et un cast implicite est fait vers une 
 <p>J’ai promis des exemples de code, les voici.</p>
 </div>
 <div class="paragraph">
-<p>Voici l’implémentation du visitor pattern avec le modèle de Facture :</p>
+<p>Voici l’implémentation du visitor pattern avec le modèle de <code>Invoice</code> :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="kd">interface</span> <span class="nc">FactureVisitable</span> <span class="o">{</span>
-  <span class="k">default</span> <span class="kt">void</span> <span class="nf">accept</span><span class="o">(</span><span class="nc">FactureVisitor</span> <span class="n">factureVisitor</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">factureVisitor</span><span class="o">.</span><span class="na">visit</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">interface</span> <span class="nc">InvoiceVisitable</span> <span class="o">{</span>
+  <span class="k">default</span> <span class="kt">void</span> <span class="nf">accept</span><span class="o">(</span><span class="nc">InvoiceVisitor</span> <span class="n">invoiceVisitor</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">invoiceVisitor</span><span class="o">.</span><span class="na">visit</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 
-<span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">Facture</span> <span class="kd">implements</span> <span class="nc">FactureVisitable</span> <span class="o">{</span>
+<span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">Invoice</span> <span class="kd">implements</span> <span class="nc">InvoiceVisitable</span> <span class="o">{</span>
 <span class="o">}</span>
 
-<span class="kd">class</span> <span class="nc">FacturePayée</span> <span class="kd">extends</span> <span class="nc">Facture</span> <span class="o">{</span>
+<span class="kd">class</span> <span class="nc">PaidInvoice</span> <span class="kd">extends</span> <span class="nc">Invoice</span> <span class="o">{</span>
 <span class="o">}</span>
 
-<span class="kd">class</span> <span class="nc">FactureDue</span> <span class="kd">extends</span> <span class="nc">Facture</span> <span class="o">{</span>
-  <span class="kd">private</span> <span class="nc">Integer</span> <span class="n">nombreRelance</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+<span class="kd">class</span> <span class="nc">DueInvoice</span> <span class="kd">extends</span> <span class="nc">Invoice</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="nc">Integer</span> <span class="n">reminderNumber</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
 
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">incrementerNombreRelance</span><span class="o">(){</span>
-    <span class="n">nombreRelance</span><span class="o">++;</span>
+    <span class="n">reminderNumber</span><span class="o">++;</span>
   <span class="o">}</span>
 
-  <span class="kd">public</span> <span class="kt">boolean</span> <span class="n">aDejaEteRelancée</span><span class="o">()</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">nombreRelance</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">hasAlreadyBeenReminded</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">reminderNumber</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">;</span>
   <span class="o">}</span>
 <span class="o">}</span>
 
-<span class="kd">interface</span> <span class="nc">FactureVisitor</span> <span class="o">{</span>
-  <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">FacturePayée</span> <span class="n">facturePayée</span><span class="o">);</span>
+<span class="kd">interface</span> <span class="nc">InvoiceVisitor</span> <span class="o">{</span>
+  <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">PaidInvoice</span> <span class="n">paidInvoice</span><span class="o">);</span>
 
-  <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">FactureDue</span> <span class="n">factureDue</span><span class="o">);</span>
+  <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">DueInvoice</span> <span class="n">dueInvoice</span><span class="o">);</span>
 <span class="o">}</span>
 
-<span class="kd">interface</span> <span class="nc">ServiceLettrage</span> <span class="o">{</span>
-  <span class="kt">void</span> <span class="nf">lettrer</span><span class="o">(</span><span class="nc">FacturePayée</span> <span class="n">facturePayée</span><span class="o">);</span>
+<span class="kd">interface</span> <span class="nc">LetterService</span> <span class="o">{</span>
+  <span class="kt">void</span> <span class="nf">letter</span><span class="o">(</span><span class="nc">PaidInvoice</span> <span class="n">paidInvoice</span><span class="o">);</span>
 <span class="o">}</span>
 
-<span class="kd">interface</span> <span class="nc">ServiceRecouvrement</span> <span class="o">{</span>
-  <span class="kt">void</span> <span class="nf">relancer</span><span class="o">(</span><span class="nc">FactureDue</span> <span class="n">factureDue</span><span class="o">);</span>
+<span class="kd">interface</span> <span class="nc">RecoveryService</span> <span class="o">{</span>
+  <span class="kt">void</span> <span class="nf">relancer</span><span class="o">(</span><span class="nc">DueInvoice</span> <span class="n">dueInvoice</span><span class="o">);</span>
 <span class="o">}</span>
 
-<span class="n">record</span> <span class="nf">MainFactureVisitor</span><span class="o">(</span><span class="nc">ServiceLettrage</span> <span class="n">serviceLettrage</span><span class="o">,</span> <span class="nc">ServiceRecouvrement</span> <span class="n">serviceRecouvrement</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">FactureVisitor</span> <span class="o">{</span>
+<span class="n">record</span> <span class="nf">MainInvoiceVisitor</span><span class="o">(</span><span class="nc">LetterService</span> <span class="n">letterService</span><span class="o">,</span> <span class="nc">RecoveryService</span> <span class="n">recoveryService</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">InvoiceVisitor</span> <span class="o">{</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">FacturePayée</span> <span class="n">facturePayée</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">serviceLettrage</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">PaidInvoice</span> <span class="n">paidInvoice</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">letterService</span><span class="o">.</span><span class="na">letter</span><span class="o">(</span><span class="n">paidInvoice</span><span class="o">);</span>
   <span class="o">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">FactureDue</span> <span class="n">factureDue</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">serviceRecouvrement</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">factureDue</span><span class="o">);</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">visit</span><span class="o">(</span><span class="nc">DueInvoice</span> <span class="n">dueInvoice</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">recoveryService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">dueInvoice</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span>
 
-<span class="n">record</span> <span class="nf">FactureService</span><span class="o">(</span><span class="nc">MainFactureVisitor</span> <span class="n">mainFactureVisitor</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">TraitementFacture</span> <span class="o">{</span>
+<span class="n">record</span> <span class="nf">InvoiceService</span><span class="o">(</span><span class="nc">MainInvoiceVisitor</span> <span class="n">mainInvoiceVisitor</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">InvoiceProcessing</span> <span class="o">{</span>
 
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterFacture</span><span class="o">(</span><span class="nc">Facture</span> <span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">facture</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">mainFactureVisitor</span><span class="o">);</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterInvoice</span><span class="o">(</span><span class="nc">Invoice</span> <span class="n">invoice</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">invoice</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">mainInvoiceVisitor</span><span class="o">);</span>
   <span class="o">}</span>
 <span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>On observe que le rapport code utile/pure invention n’est pas excellent.</p>
+<p>On observe que le rapport code utile/https://en.wikipedia.org/wiki/Boilerplate_code[boilerplate] n’est pas excellent.</p>
 </div>
 <div class="paragraph">
 <p>Et maintenant :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="n">record</span> <span class="nf">FactureService</span><span class="o">(</span><span class="nc">LettrageService</span> <span class="n">lettrageService</span><span class="o">,</span> <span class="nc">RecouvrementService</span> <span class="n">recouvrementService</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">TraitementFacture</span> <span class="o">{</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="n">record</span> <span class="nf">InvoiceService</span><span class="o">(</span><span class="nc">LetterService</span> <span class="n">letterService</span><span class="o">,</span> <span class="nc">RecoveryService</span> <span class="n">recoveryService</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">InvoiceProcessing</span> <span class="o">{</span>
 
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterFacture</span><span class="o">(</span><span class="nc">Facture</span> <span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FacturePayée</span> <span class="n">facturePayée</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterInvoice</span><span class="o">(</span><span class="nc">Invoice</span> <span class="n">invoice</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">invoice</span> <span class="k">instanceof</span> <span class="nc">PaidInvoice</span> <span class="n">paidInvoice</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">letterService</span><span class="o">.</span><span class="na">letter</span><span class="o">(</span><span class="n">paidInvoice</span><span class="o">);</span>
       <span class="k">return</span><span class="o">;</span>
     <span class="o">}</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">facture</span> <span class="k">instanceof</span> <span class="nc">FactureDue</span> <span class="n">factureDue</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">recouvrementService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">factureDue</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">invoice</span> <span class="k">instanceof</span> <span class="nc">DueInvoice</span> <span class="n">dueInvoice</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">recoveryService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">dueInvoice</span><span class="o">);</span>
     <span class="o">}</span>
   <span class="o">}</span>
 <span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Le FactureService se suffit à lui-même, et la lisibilité me semble très acceptable.</p>
+<p>Le <code>InvoiceService</code> se suffit à lui-même, et la lisibilité me semble très acceptable.</p>
 </div>
 <div class="paragraph">
 <p>Mais avez-vous remarqué quelque chose dans ce dernier bout de code ?</p>
 </div>
 <div class="paragraph">
-<p>Le cas où <code>facture</code> est d’un autre type n’est pas géré !<br>
+<p>Le cas où <code>invoice</code> est d’un autre type n’est pas géré !<br>
 Et non, pas de <code>throw new NotImplementedException()</code> cette fois-ci.<br></p>
 </div>
 <div class="paragraph">
@@ -1045,21 +1045,21 @@ Modifions un peu notre modèle :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="kd">abstract</span> <span class="n">sealed</span> <span class="kd">class</span> <span class="nc">Facture</span> <span class="n">permits</span> <span class="nc">FacturePayée</span><span class="o">,</span> <span class="nc">FactureDue</span> <span class="o">{</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">abstract</span> <span class="n">sealed</span> <span class="kd">class</span> <span class="nc">Invoice</span> <span class="n">permits</span> <span class="nc">PaidInvoice</span><span class="o">,</span> <span class="nc">DueInvoice</span> <span class="o">{</span>
 <span class="o">}</span>
 
-<span class="kd">final</span> <span class="kd">class</span> <span class="nc">FacturePayée</span> <span class="kd">extends</span> <span class="nc">Facture</span> <span class="o">{</span>
+<span class="kd">final</span> <span class="kd">class</span> <span class="nc">PaidInvoice</span> <span class="kd">extends</span> <span class="nc">Invoice</span> <span class="o">{</span>
 <span class="o">}</span>
 
-<span class="kd">final</span> <span class="kd">class</span> <span class="nc">FactureDue</span> <span class="kd">extends</span> <span class="nc">Facture</span> <span class="o">{</span>
-  <span class="kd">private</span> <span class="nc">Integer</span> <span class="n">nombreRelance</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+<span class="kd">final</span> <span class="kd">class</span> <span class="nc">DueInvoice</span> <span class="kd">extends</span> <span class="nc">Invoice</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="nc">Integer</span> <span class="n">reminderNumber</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
 
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">incrementerNombreRelance</span><span class="o">(){</span>
-    <span class="n">nombreRelance</span><span class="o">++;</span>
+    <span class="n">reminderNumber</span><span class="o">++;</span>
   <span class="o">}</span>
 
-  <span class="kd">public</span> <span class="kt">boolean</span> <span class="n">aDejaEteRelancée</span><span class="o">()</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">nombreRelance</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">hasAlreadyBeenReminded</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">reminderNumber</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">;</span>
   <span class="o">}</span>
 <span class="o">}</span></code></pre>
 </div>
@@ -1068,7 +1068,7 @@ Modifions un peu notre modèle :</p>
 <dl>
 <dt class="hdlist1">Traduction en français : </dt>
 <dd>
-<p>Il n’existe que 2 types de Facture possibles : FacturePayée et FactureDue.<br>
+<p>Il n’existe que 2 types de <code>Invoice</code> possibles : <code>PaidInvoice</code> et <code>DueInvoice</code>.<br>
 Ces dernières ne peuvent être étendues.<br>
 Point.</p>
 </dd>
@@ -1079,19 +1079,19 @@ Point.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="n">record</span> <span class="nf">FactureService</span><span class="o">(</span><span class="nc">LettrageService</span> <span class="n">lettrageService</span><span class="o">,</span> <span class="nc">RecouvrementService</span> <span class="n">recouvrementService</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">TraitementFacture</span> <span class="o">{</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="n">record</span> <span class="nf">InvoiceService</span><span class="o">(</span><span class="nc">LetterService</span> <span class="n">letterService</span><span class="o">,</span> <span class="nc">RecoveryService</span> <span class="n">recoveryService</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">InvoiceProcessing</span> <span class="o">{</span>
 
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterFacture</span><span class="o">(</span><span class="nc">Facture</span> <span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">switch</span> <span class="o">(</span><span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">case</span> <span class="nc">FacturePayée</span> <span class="n">facturePayée</span> <span class="o">-&gt;</span> <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
-      <span class="c1">// case FactureDue factureDue -&gt; recouvrementService.relancer(factureDue);</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterInvoice</span><span class="o">(</span><span class="nc">Invoice</span> <span class="n">invoice</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">invoice</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">PaidInvoice</span> <span class="n">paidInvoice</span> <span class="o">-&gt;</span> <span class="n">letterService</span><span class="o">.</span><span class="na">letter</span><span class="o">(</span><span class="n">paidInvoice</span><span class="o">);</span>
+      <span class="c1">// case DueInvoice dueInvoice -&gt; recoveryService.relancer(dueInvoice);</span>
     <span class="o">}</span>
   <span class="o">}</span>
 <span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>J’ai commenté le cas de la <code>FactureDue</code> afin d’observer ce que nous disent le compilateur et l’ide :</p>
+<p>J’ai commenté le cas de la <code>DueInvoice</code> afin d’observer ce que nous disent le compilateur et l’IDE :</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -1104,7 +1104,7 @@ Point.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>On doit alors déclarer le <code>Consumer&lt;? extends Facture&gt;</code> de tous les cas restants, ou bien les grouper dans un <code>default</code> :</p>
+<p>On doit alors déclarer le <code>Consumer&lt;? extends Invoice&gt;</code> de tous les cas restants, ou bien les grouper dans un <code>default</code> :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1118,12 +1118,12 @@ Point.</p>
  8
  9
 10
-</pre></td><td class="code"><pre><span class="n">record</span> <span class="nf">FactureService</span><span class="o">(</span><span class="nc">LettrageService</span> <span class="n">lettrageService</span><span class="o">,</span> <span class="nc">RecouvrementService</span> <span class="n">recouvrementService</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">TraitementFacture</span> <span class="o">{</span>
+</pre></td><td class="code"><pre><span class="n">record</span> <span class="nf">InvoiceService</span><span class="o">(</span><span class="nc">LetterService</span> <span class="n">letterService</span><span class="o">,</span> <span class="nc">RecoveryService</span> <span class="n">recoveryService</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">InvoiceProcessing</span> <span class="o">{</span>
 
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterFacture</span><span class="o">(</span><span class="nc">Facture</span> <span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">switch</span> <span class="o">(</span><span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">case</span> <span class="nc">FacturePayée</span> <span class="n">facturePayée</span> <span class="o">-&gt;</span> <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
-<span class="hll">      <span class="c1">// case FactureDue factureDue -&gt; recouvrementService.relancer(factureDue);</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterInvoice</span><span class="o">(</span><span class="nc">Invoice</span> <span class="n">invoice</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">invoice</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">PaidInvoice</span> <span class="n">paidInvoice</span> <span class="o">-&gt;</span> <span class="n">letterService</span><span class="o">.</span><span class="na">letter</span><span class="o">(</span><span class="n">paidInvoice</span><span class="o">);</span>
+<span class="hll">      <span class="c1">// case DueInvoice dueInvoice -&gt; recoveryService.relancer(dueInvoice);</span>
 </span><span class="hll">      <span class="k">default</span> <span class="o">-&gt;</span> <span class="no">LOGGER</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Cool y a rien à faire pour le cas là !"</span><span class="o">);</span>
 </span>    <span class="o">}</span>
   <span class="o">}</span>
@@ -1136,11 +1136,8 @@ Point.</p>
 C’est les TDDistes qui sont contents.</p>
 </div>
 <div class="paragraph">
-<p>Alors très bien, mais l’objectif à terme du pattern matching va encore plus loin.<br>
-On va pouvoir (Java &gt;= 19),</p>
-</div>
-<div class="paragraph">
-<p>/!\ On passe maintenant sur du code qu</p>
+<p>Et si on allait encore plus loin ?<br>
+Allez, ajoutons une feature preview de Java 17 : un "Guarded Pattern"</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1157,21 +1154,72 @@ On va pouvoir (Java &gt;= 19),</p>
 11
 12
 13
-</pre></td><td class="code"><pre><span class="n">record</span> <span class="nf">FactureService</span><span class="o">(</span>
-    <span class="nc">LettrageService</span> <span class="n">lettrageService</span><span class="o">,</span>
-    <span class="nc">RecouvrementService</span> <span class="n">recouvrementService</span><span class="o">)</span>
-    <span class="kd">implements</span> <span class="nc">TraitementFacture</span> <span class="o">{</span>
+</pre></td><td class="code"><pre><span class="n">record</span> <span class="nf">InvoiceService</span><span class="o">(</span>
+    <span class="nc">LetterService</span> <span class="n">letterService</span><span class="o">,</span>
+    <span class="nc">RecoveryService</span> <span class="n">recoveryService</span><span class="o">)</span>
+    <span class="kd">implements</span> <span class="nc">InvoiceProcessing</span> <span class="o">{</span>
 
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterFacture</span><span class="o">(</span><span class="nc">Facture</span> <span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
-    <span class="k">switch</span> <span class="o">(</span><span class="n">facture</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">case</span> <span class="nc">FacturePayée</span> <span class="n">facturePayée</span> <span class="o">-&gt;</span> <span class="n">lettrageService</span><span class="o">.</span><span class="na">lettrer</span><span class="o">(</span><span class="n">facturePayée</span><span class="o">);</span>
-<span class="hll">      <span class="k">case</span> <span class="nc">FactureDue</span> <span class="n">factureDue</span> <span class="o">&amp;&amp;</span> <span class="n">factureDue</span><span class="o">.</span><span class="na">aDejaÉtéRelancée</span><span class="o">()</span> <span class="o">-&gt;</span> <span class="n">recouvrementService</span><span class="o">.</span><span class="na">demarrerRecouvrement</span><span class="o">(</span><span class="n">factureDue</span><span class="o">);</span>
-</span>      <span class="k">case</span> <span class="nc">FactureDue</span> <span class="n">factureDue</span> <span class="o">-&gt;</span> <span class="n">recouvrementService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">factureDue</span><span class="o">);</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">traiterInvoice</span><span class="o">(</span><span class="nc">Invoice</span> <span class="n">invoice</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">invoice</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">PaidInvoice</span> <span class="n">paidInvoice</span> <span class="o">-&gt;</span> <span class="n">letterService</span><span class="o">.</span><span class="na">letter</span><span class="o">(</span><span class="n">paidInvoice</span><span class="o">);</span>
+<span class="hll">      <span class="k">case</span> <span class="nc">DueInvoice</span> <span class="n">dueInvoice</span> <span class="o">&amp;&amp;</span> <span class="n">dueInvoice</span><span class="o">.</span><span class="na">aDéjàÉtéRelancée</span><span class="o">()</span> <span class="o">-&gt;</span> <span class="n">recoveryService</span><span class="o">.</span><span class="na">demarrerRecovery</span><span class="o">(</span><span class="n">dueInvoice</span><span class="o">);</span>
+</span>      <span class="k">case</span> <span class="nc">DueInvoice</span> <span class="n">dueInvoice</span> <span class="o">-&gt;</span> <span class="n">recoveryService</span><span class="o">.</span><span class="na">relancer</span><span class="o">(</span><span class="n">dueInvoice</span><span class="o">);</span>
     <span class="o">}</span>
   <span class="o">}</span>
 <span class="o">}</span>
 </pre></td></tr></tbody></table></code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Un "Guarded Pattern" permet d&#8217;ajouter à notre pattern des conditions sur les valeurs de l&#8217;objet matché en plus de son type.</p>
+</div>
+<div class="paragraph">
+<p>Alors c’est très bien tout ça, mais l’objectif à terme du pattern matching va encore plus loin en ce qui concerne les records.<br></p>
+</div>
+<div class="paragraph">
+<p>Reprenons notre exemple de <code>Invoice</code>, mais considérons qu’elle vient d’arriver d’un <code>Controlleur</code> sour forme de DTO (et donc de record) :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">record</span> <span class="nf">Invoice</span><span class="o">(</span><span class="nc">String</span> <span class="n">code</span><span class="o">,</span> <span class="nc">String</span> <span class="n">libellé</span><span class="o">,</span> <span class="nc">Integer</span> <span class="n">amount</span><span class="o">,</span> <span class="nc">ZonedDateTime</span> <span class="n">dateCréation</span><span class="o">,</span> <span class="o">...){}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Je ne lui donne que quelques champs, mais considérons en plus qu’il y a en une vingtaine, une centaine, beaucoup&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Quand je veux mapper cette invoice vers un usecase, alors ce dernier n’a très certainement besoin que de seulement quelques-uns de ces champs.
+Le code suivant serait donc une erreur de design :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><table class="linenotable"><tbody><tr><td class="linenos gl"><pre class="lineno"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+</pre></td><td class="code"><pre><span class="nd">@RestController</span>
+<span class="kd">class</span> <span class="nc">InvoiceControlleur</span> <span class="o">{</span>
+
+  <span class="nd">@PostMapping</span>
+  <span class="nd">@ResponseStatus</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">CREATED</span><span class="o">)</span>
+  <span class="kd">public</span> <span class="nc">Long</span> <span class="nf">create</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="nc">Invoice</span> <span class="n">invoice</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Preconditions</span><span class="o">.</span><span class="na">checkNotNull</span><span class="o">(</span><span class="n">invoice</span><span class="o">);</span>
+<span class="hll">    <span class="n">notifierNouvelleInvoiceUseCase</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="n">invoice</span><span class="o">);</span>
+</span>    <span class="k">return</span> <span class="n">invoiceService</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="n">invoice</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Après Java 18 (Java 19 avec un peu de chance 🍀), on va pouvoir déconstruire des structures de données.</p>
 </div>
 </div>
 </div>
@@ -1182,32 +1230,33 @@ On va pouvoir (Java &gt;= 19),</p>
 <p>Ce concept a un objectif similaire au I de SOLID : la ségrégation.</p>
 </div>
 <div class="paragraph">
-<p>Si je reçois un objet avec 42 champs alors que j’en ai besoin que de 2, la "<em>deconstruction on pattern</em>" va m’aider.</p>
+<p>Si je reçois un objet avec 43 champs alors que j’en ai besoin que de 2, la "<em>deconstruction on pattern</em>" va m’aider.</p>
 </div>
 <div class="paragraph">
 <p>Regardons ça avec du code.</p>
 </div>
 <div class="paragraph">
-<p>J’ai mon énorme dto reçu :</p>
+<p>J’ai mon énorme dto receipt :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="n">record</span> <span class="nf">Product</span><span class="o">(</span>
-  <span class="nc">String</span> <span class="n">type</span><span class="o">,</span>
-  <span class="nc">String</span> <span class="n">price</span><span class="o">,</span>
-  <span class="nc">String</span> <span class="n">name</span><span class="o">,</span>
-  <span class="c1">// imaginez ici 39 autres champs</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="n">record</span> <span class="nf">Invoice</span><span class="o">(</span>
+  <span class="nc">String</span> <span class="n">code</span><span class="o">,</span>
+  <span class="nc">String</span> <span class="n">libellé</span><span class="o">,</span>
+  <span class="nc">Integer</span> <span class="n">amount</span><span class="o">,</span>
+  <span class="nc">ZonedDateTime</span> <span class="n">dateCréation</span><span class="o">,</span>
+  <span class="o">...</span> <span class="c1">// imaginez ici 39 autres champs</span>
 <span class="o">){}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Mais la règle métier que je veux appliquer ne porte que sur le <code>type</code> et le <code>price</code>.
-Je peux alors étendre le concept de <code>instanceof</code> précédent, en lui ajoutant une déconstruction du Record "Product" :</p>
+<p>Mais la règle métier que je veux appliquer ne porte que sur le <code>code</code> et le <code>amount</code>.
+Je peux alors étendre le concept de <code>instanceof</code> précédent, en lui ajoutant une déconstruction du Record "Invoice" :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">object</span> <span class="k">instanceof</span> <span class="nf">Product</span><span class="o">(</span><span class="nc">String</span> <span class="n">type</span><span class="o">,</span> <span class="nc">String</span> <span class="n">price</span><span class="o">))</span> <span class="o">{</span>
-  <span class="n">myUseCase</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">type</span><span class="o">,</span> <span class="n">price</span><span class="o">);</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">object</span> <span class="k">instanceof</span> <span class="nf">Invoice</span><span class="o">(</span><span class="nc">String</span> <span class="n">code</span><span class="o">,</span> <span class="nc">Integer</span> <span class="n">amount</span><span class="o">))</span> <span class="o">{</span>
+  <span class="n">myUseCase</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="n">code</span><span class="o">,</span> <span class="n">amount</span><span class="o">);</span>
 <span class="o">}</span></code></pre>
 </div>
 </div>
@@ -1216,88 +1265,30 @@ Je peux alors étendre le concept de <code>instanceof</code> précédent, en lui
 </div>
 <div class="sect2">
 <h3 id="_et_ça_sert_à_quoi">Et ça sert à quoi ?</h3>
-<div class="paragraph">
-<p>Tout seul comme ça, pas encore grand-chose.</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Découplage</p>
+</li>
+<li>
+<p>Expressivité</p>
+</li>
+</ol>
 </div>
 <div class="paragraph">
-<p>Pour le cas du <code>instanceof</code>, on gagne toutefois nettement en intelligibilité du code.</p>
+<p>Je ne compte pas expliquer ici en quoi ces 2 principes logiciels sont bénéfiques.</p>
 </div>
 <div class="paragraph">
 <p>Comparez plutôt avec la méthode habituelle :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">vehicle</span> <span class="k">instanceof</span> <span class="nc">Car</span><span class="o">)</span> <span class="o">{</span>
-  <span class="o">((</span><span class="nc">Car</span><span class="o">)</span> <span class="n">vehicle</span><span class="o">).</span><span class="na">drive</span><span class="o">();</span>
-<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">vehicle</span> <span class="k">instanceof</span> <span class="nc">Plane</span><span class="o">)</span> <span class="o">{</span>
-  <span class="o">((</span><span class="nc">Plane</span><span class="o">)</span> <span class="n">vehicle</span><span class="o">).</span><span class="na">fly</span><span class="o">();</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">object</span> <span class="k">instanceof</span> <span class="nc">Invoice</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Invoice</span> <span class="n">invoice</span> <span class="o">=</span> <span class="o">((</span><span class="nc">Invoice</span><span class="o">)</span> <span class="n">object</span><span class="o">);</span>
+    <span class="nc">String</span> <span class="n">type</span> <span class="o">=</span> <span class="n">invoice</span><span class="o">.</span><span class="na">getType</span><span class="o">();</span>
+    <span class="nc">String</span> <span class="n">price</span> <span class="o">=</span> <span class="n">invoice</span><span class="o">.</span><span class="na">getPrice</span><span class="o">();</span>
+    <span class="n">myUseCase</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="n">type</span><span class="o">,</span> <span class="n">price</span><span class="o">);</span>
 <span class="o">}</span></code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">object</span> <span class="k">instanceof</span> <span class="nc">Product</span><span class="o">)</span> <span class="o">{</span>
-  <span class="nc">String</span> <span class="n">type</span> <span class="o">=</span> <span class="o">((</span><span class="nc">Product</span><span class="o">)</span> <span class="n">object</span><span class="o">).</span><span class="na">type</span><span class="o">;</span>
-  <span class="nc">String</span> <span class="n">price</span> <span class="o">=</span> <span class="o">((</span><span class="nc">Product</span><span class="o">)</span> <span class="n">object</span><span class="o">).</span><span class="na">price</span><span class="o">;</span>
-  <span class="n">myUseCase</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">type</span><span class="o">,</span> <span class="n">price</span><span class="o">);</span>
-<span class="o">}</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Mais là où ça prend tout son intérêt, c’est quand on y ajoute le concept de classe scellée dans un "Switch on Pattern".</p>
-</div>
-<div class="paragraph">
-<p>Voyons cela.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="n">sealed</span> <span class="kd">interface</span> <span class="nc">Document</span> <span class="n">permits</span> <span class="nc">Invoice</span><span class="o">,</span> <span class="nc">Contract</span> <span class="o">{}</span>
-<span class="kd">public</span> <span class="n">record</span> <span class="nf">Invoice</span><span class="o">(</span><span class="kt">int</span> <span class="n">amount</span><span class="o">,</span> <span class="nc">String</span> <span class="n">buyer</span><span class="o">,</span> <span class="nc">String</span> <span class="nc">Seller</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">Document</span> <span class="o">{}</span>
-<span class="kd">public</span> <span class="n">record</span> <span class="nf">Contract</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">parties</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">formalities</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">terms</span><span class="o">)</span> <span class="kd">implements</span> <span class="nc">Document</span> <span class="o">{}</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Ici, grâce au mécanisme de sceau (<code>sealed</code>), on indique au compilateur la liste exhaustive des implémentations de Document :</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Invoice</p>
-</li>
-<li>
-<p>Contract</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Les DTO <code>Invoice</code> et <code>Contract</code> sont reçu dans les modules Customer, Administrator et Partner (1 module = 1 context métier).</p>
-</div>
-<div class="paragraph">
-<p>Pour chaque implémentation, on veut effectuer des validations métiers différentes.</p>
-</div>
-<div class="paragraph">
-<p>La méthode habituelle de la programmation orientée object, c’est d’avoir une méthode <code>void validate()</code> dans l’interface Document, et de la faire implémenter par Invoice et Contract.</p>
-</div>
-<div class="paragraph">
-<p>Le problème avec ça, c’est que</p>
-</div>
-<div class="paragraph">
-<p>Mettons alors qu’on reçoive un DTO Document.</p>
-</div>
-<div class="paragraph">
-<p>Implémentons la sélection de la validation à appliquer à l’aide</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="java"></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Implémentons la sélection de la validation à appliquer à l’aide d’un "Switch on Pattern" :</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="java"></code></pre>
 </div>
 </div>
 </div>
@@ -1312,7 +1303,7 @@ Je peux alors étendre le concept de <code>instanceof</code> précédent, en lui
 <div class="ulist">
 <ul>
 <li>
-<p>Plus de sécurité</p>
+<p>Un boucle de feedback plus rapide</p>
 </li>
 <li>
 <p>Développer plus intuitivement (le compilateur nous dis ce qu’on a oublié)</p>
@@ -1340,24 +1331,10 @@ Je peux alors étendre le concept de <code>instanceof</code> précédent, en lui
 <div class="sect1">
 <h2 id="_conclusion">Conclusion</h2>
 <div class="sectionbody">
-
+<div class="literalblock">
+<div class="content">
+<pre>// todo</pre>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_brainstorm_area">brainstorm area</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>Pattern guards, Guarded Pattern</p>
-</li>
-<li>
-<p>Sealed classes</p>
-</li>
-<li>
-<p>Expressivité</p>
-</li>
-</ul>
 </div>
 </div>
 </div>
@@ -1382,7 +1359,7 @@ Je peux alors étendre le concept de <code>instanceof</code> précédent, en lui
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-02-09 15:32:59 +0100
+Last updated 2022-03-03 17:39:53 +0100
 </div>
 </div>
 </body>
