@@ -44,30 +44,31 @@ Dans ce genre d’applications, quelle que soit l’architecture choisie ou le s
 Cela peut être fait dans un package spécifique avec des POJO, ou avec des `Entity` JPA. +
 La seconde option est la plus répandue, mais ce n’est pas ma préférée.
 Je trouve que c’est une erreur de concevoir le business d’une application autour d’une base de données. +
-2.{nbsp}Écrire des DTO ::
+2.{nbsp}Écrire des https://en.wikipedia.org/wiki/Data_transfer_object[DTO] ::
 Dans l’idéal, un dto est immutable (Il n’y a aucune raison de changer la représentation d’une donnée transmise à un moment T). +
-Le Record est la structure de données la plus appropriée. +
-Sinon, avant Java 14, on a les `@Value` de Lombok.
+Le `record` est la structure de données la plus appropriée. +
+Sinon, avant Java 14, on a les `@Value` de Lombok. +
+On peut aussi se contenter de POJO mutables.
 
 Dans nos applications modulaires, on peut avoir envie de partager ces structures de données entre les modules :
 
-[plantuml,Modèle du domain Facture,png]
+[plantuml,Modèle du domain Invoice,png]
 ----
 @startuml
 allow_mixing
 
 node "Domain model" {
-	class Facture
+	class Invoice
 }
 
-node "Module lettrage" {
-	usecase usecaseLettragePartiel
-	usecaseLettragePartiel - Facture
+node "Module letter" {
+	usecase usecaseLetterPartiel
+	usecaseLetterPartiel - Invoice
 }
 
-node "Module recouvrement" {
+node "Module recovery" {
 	usecase usecasePremiereRelance
-	usecasePremiereRelance - Facture
+	usecasePremiereRelance - Invoice
 }
 
 @enduml
@@ -76,10 +77,10 @@ node "Module recouvrement" {
 Et bien pour faire varier les comportements des actions affectant ces classes, la POO nous incite à ajouter des méthodes sur nos classes de domaine. +
 //En effet, c’est un Objet, il a un état, et il peut porter des méthodes consommant ou modifiant cet état.
 
-Par exemple, pour la domain-class `Facture`, le module lettrage pourrait vouloir ajouter une méthode `calculerMontantRestantAPayer()`. +
-Le module envoie pourrait vouloir une méthode `getDestinataires()`.
+Par exemple, pour la domain-class `Invoice`, le module letter pourrait vouloir ajouter une méthode `calculateRemainingAmountToPay()`. +
+Le module envoie pourrait vouloir une méthode `getRecipients()`.
 
-[plantuml,Modèle de domaine avec Facture et cas d’utilisation,png]
+[plantuml,Modèle de domaine avec Invoice et cas d’utilisation,png]
 ----
 @startuml
 allow_mixing
@@ -87,23 +88,23 @@ allow_mixing
 node "Domain model" {
 
 
-	class Facture implements MontantCalculable, Envoyable {
-	Integer calculerMontantRestantAPayer()
-	List<Personne> getDestinataires()
+	class Invoice implements AmountCalculable, Envoyable {
+	Integer calculateRemainingAmountToPay()
+	List<Personne> getRecipients()
   }
 
-  interface MontantCalculable
+  interface AmountCalculable
   interface Envoyable
 }
 
-node "Module lettrage" {
-  usecase usecaseLettragePartiel
-  usecaseLettragePartiel - Facture
+node "Module letter" {
+  usecase usecaseLetterPartiel
+  usecaseLetterPartiel - Invoice
 }
 
 node "Module envoi" {
   usecase usecasePremiereRelance
-  usecasePremiereRelance - Facture
+  usecasePremiereRelance - Invoice
 }
 
 @enduml
@@ -111,20 +112,20 @@ node "Module envoi" {
 
 [source,java]
 ----
-class Facture implements MontantCalculable, Envoyable {
+class Invoice implements AmountCalculable, Envoyable {
 	private String libelle;
-	private CodeFacture code;
+	private CodeInvoice code;
 	private Client client;
-	private Reçu reçu;
-	private Devise montant;
+	private Receipt receipt;
+	private Devise amount;
 
 	@Override
-	public Integer calculerMontantRestantAPayer(){
+	public Integer calculateRemainingAmountToPay(){
 		...
 	}
 
 	@Override
-	public List<Personne> getDestinataires(){
+	public List<Personne> getRecipients(){
 		...
 	}
 
@@ -132,13 +133,13 @@ class Facture implements MontantCalculable, Envoyable {
 }
 ----
 
-Au bout d’un moment, notre domain-class `Facture` a beaucoup de méthodes issues de différents modules. +
-Le module lettrage utilise `Facture` et se retrouve à pouvoir appeler les méthodes du module d’envoi ; ce qui viole au moins :
+Au bout d’un moment, notre domain-class `Invoice` a beaucoup de méthodes issues de différents modules. +
+Le module letter utilise `Invoice` et se retrouve à pouvoir appeler les méthodes du module d’envoi ; ce qui viole au moins :
 
 * Le https://fr.wikipedia.org/wiki/Principe_de_s%C3%A9gr%C3%A9gation_des_interfaces[principe de ségrégation des interfaces]
-* Le https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique[principe de responsabilité unique] (Car la classe Document a maintenant 2 raisons de changer : le contexte _lettrage_ et le contexte _envoi_)
+* Le https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique[principe de responsabilité unique] (Car la classe Document a maintenant 2 raisons de changer : le contexte _letter_ et le contexte _envoi_)
 
-Effet bonus : Quand on change `Facture` dans le cadre du contexte _lettrage_, on doit recompiler/relivrer aussi le contexte _envoi_.
+Effet bonus : Quand on change `Invoice` dans le cadre du contexte _letter_, on doit recompiler/relivrer aussi le contexte _envoi_.
 
 === Solution : séparer la logique métier des structures sur lesquelles elle agit
 
@@ -173,12 +174,12 @@ Avant Java 17, on avait ça :
 
 [source,java]
 ----
-if (facture instanceof FacturePayée) { // Oui je mets des accents dans mon code français. La sémantique !
-	lettrageService.lettrer(((FacturePayée) facture));
+if (invoice instanceof PaidInvoice) { // Oui je mets des accents dans mon code français. La sémantique !
+	letterService.letter(((PaidInvoice) invoice));
 	return;
 }
-if (facture instanceof FactureDue) {
-	recouvrementService.relancer(((FactureDue) facture));
+if (invoice instanceof DueInvoice) {
+	recoveryService.relancer(((DueInvoice) invoice));
 }
 ----
 
@@ -186,112 +187,112 @@ Et à présent :
 
 [source,java]
 ----
-if (facture instanceof FacturePayée facturePayée) {
-	lettrageService.lettrer(facturePayée);
+if (invoice instanceof PaidInvoice paidInvoice) {
+	letterService.letter(paidInvoice);
 	return;
 }
-if (facture instanceof FactureDue factureDue) {
-	recouvrementService.relancer(factureDue);
+if (invoice instanceof DueInvoice dueInvoice) {
+	recoveryService.relancer(dueInvoice);
 }
 ----
 
-Ici le pattern à matcher est l’appartenance aux classes `FacturePayée` et `FactureDue`.
-On teste si l’instance a un des types, et un cast implicite est fait vers une "binding variable" (`facturePayée` ou `factureDue`).
+Ici le pattern à matcher est l’appartenance aux classes `PaidInvoice` et `DueInvoice`.
+On teste si l’instance a un des types, et un cast implicite est fait vers une "binding variable" (`paidInvoice` ou `dueInvoice`).
 
 == Comment le Pattern Matching remplace-t-il le visitor pattern ?
 
 J’ai promis des exemples de code, les voici.
 
-Voici l’implémentation du visitor pattern avec le modèle de Facture :
+Voici l’implémentation du visitor pattern avec le modèle de `Invoice` :
 
 [source,java]
 ----
 
-interface FactureVisitable {
-	default void accept(FactureVisitor factureVisitor) {
-		factureVisitor.visit(this);
+interface InvoiceVisitable {
+	default void accept(InvoiceVisitor invoiceVisitor) {
+		invoiceVisitor.visit(this);
 	}
 }
 
-abstract class Facture implements FactureVisitable {
+abstract class Invoice implements InvoiceVisitable {
 }
 
-class FacturePayée extends Facture {
+class PaidInvoice extends Invoice {
 }
 
-class FactureDue extends Facture {
-	private Integer nombreRelance = 0;
+class DueInvoice extends Invoice {
+	private Integer reminderNumber = 0;
 
 	public void incrementerNombreRelance(){
-		nombreRelance++;
+		reminderNumber++;
 	}
 
-	public boolean aDejaEteRelancée() {
-		return nombreRelance >= 1;
+	public boolean hasAlreadyBeenReminded() {
+		return reminderNumber >= 1;
 	}
 }
 
-interface FactureVisitor {
-	void visit(FacturePayée facturePayée);
+interface InvoiceVisitor {
+	void visit(PaidInvoice paidInvoice);
 
-	void visit(FactureDue factureDue);
+	void visit(DueInvoice dueInvoice);
 }
 
-interface ServiceLettrage {
-	void lettrer(FacturePayée facturePayée);
+interface LetterService {
+	void letter(PaidInvoice paidInvoice);
 }
 
-interface ServiceRecouvrement {
-	void relancer(FactureDue factureDue);
+interface RecoveryService {
+	void relancer(DueInvoice dueInvoice);
 }
 
-record MainFactureVisitor(ServiceLettrage serviceLettrage, ServiceRecouvrement serviceRecouvrement) implements FactureVisitor {
+record MainInvoiceVisitor(LetterService letterService, RecoveryService recoveryService) implements InvoiceVisitor {
 
 	@Override
-	public void visit(FacturePayée facturePayée) {
-		serviceLettrage.lettrer(facturePayée);
+	public void visit(PaidInvoice paidInvoice) {
+		letterService.letter(paidInvoice);
 	}
 
 	@Override
-	public void visit(FactureDue factureDue) {
-		serviceRecouvrement.relancer(factureDue);
+	public void visit(DueInvoice dueInvoice) {
+		recoveryService.relancer(dueInvoice);
 	}
 }
 
-record FactureService(MainFactureVisitor mainFactureVisitor) implements TraitementFacture {
+record InvoiceService(MainInvoiceVisitor mainInvoiceVisitor) implements InvoiceProcessing {
 
-	public void traiterFacture(Facture facture) {
-		facture.accept(mainFactureVisitor);
+	public void traiterInvoice(Invoice invoice) {
+		invoice.accept(mainInvoiceVisitor);
 	}
 }
 
 ----
 
-On observe que le rapport code utile/pure invention n’est pas excellent.
+On observe que le rapport code utile/https://en.wikipedia.org/wiki/Boilerplate_code[boilerplate] n’est pas excellent.
 
 Et maintenant :
 
 [source,java]
 ----
-record FactureService(LettrageService lettrageService, RecouvrementService recouvrementService) implements TraitementFacture {
+record InvoiceService(LetterService letterService, RecoveryService recoveryService) implements InvoiceProcessing {
 
-	public void traiterFacture(Facture facture) {
-		if (facture instanceof FacturePayée facturePayée) {
-			lettrageService.lettrer(facturePayée);
+	public void traiterInvoice(Invoice invoice) {
+		if (invoice instanceof PaidInvoice paidInvoice) {
+			letterService.letter(paidInvoice);
 			return;
 		}
-		if (facture instanceof FactureDue factureDue) {
-			recouvrementService.relancer(factureDue);
+		if (invoice instanceof DueInvoice dueInvoice) {
+			recoveryService.relancer(dueInvoice);
 		}
 	}
 }
 ----
 
-Le FactureService se suffit à lui-même, et la lisibilité me semble très acceptable.
+Le `InvoiceService` se suffit à lui-même, et la lisibilité me semble très acceptable.
 
 Mais avez-vous remarqué quelque chose dans ce dernier bout de code ?
 
-Le cas où `facture` est d’un autre type n’est pas géré ! +
+Le cas où `invoice` est d’un autre type n’est pas géré ! +
 Et non, pas de `throw new NotImplementedException()` cette fois-ci. +
 
 C’est là que la fonctionnalité Java 15 de types scellés intervient. +
@@ -299,27 +300,27 @@ Modifions un peu notre modèle :
 
 [source,java]
 ----
-abstract sealed class Facture permits FacturePayée, FactureDue {
+abstract sealed class Invoice permits PaidInvoice, DueInvoice {
 }
 
-final class FacturePayée extends Facture {
+final class PaidInvoice extends Invoice {
 }
 
-final class FactureDue extends Facture {
-	private Integer nombreRelance = 0;
+final class DueInvoice extends Invoice {
+	private Integer reminderNumber = 0;
 
 	public void incrementerNombreRelance(){
-		nombreRelance++;
+		reminderNumber++;
 	}
 
-	public boolean aDejaEteRelancée() {
-		return nombreRelance >= 1;
+	public boolean hasAlreadyBeenReminded() {
+		return reminderNumber >= 1;
 	}
 }
 ----
 
 Traduction en français : ::
-Il n’existe que 2 types de Facture possibles : FacturePayée et FactureDue. +
+Il n’existe que 2 types de `Invoice` possibles : `PaidInvoice` et `DueInvoice`. +
 Ces dernières ne peuvent être étendues. +
 Point.
 
@@ -327,33 +328,33 @@ Cela donne donc :
 
 [source,java]
 ----
-record FactureService(LettrageService lettrageService, RecouvrementService recouvrementService) implements TraitementFacture {
+record InvoiceService(LetterService letterService, RecoveryService recoveryService) implements InvoiceProcessing {
 
-	public void traiterFacture(Facture facture) {
-		switch (facture) {
-			case FacturePayée facturePayée -> lettrageService.lettrer(facturePayée);
-			// case FactureDue factureDue -> recouvrementService.relancer(factureDue);
+	public void traiterInvoice(Invoice invoice) {
+		switch (invoice) {
+			case PaidInvoice paidInvoice -> letterService.letter(paidInvoice);
+			// case DueInvoice dueInvoice -> recoveryService.relancer(dueInvoice);
 		}
 	}
 }
 ----
 
-J’ai commenté le cas de la `FactureDue` afin d’observer ce que nous disent le compilateur et l’ide :
+J’ai commenté le cas de la `DueInvoice` afin d’observer ce que nous disent le compilateur et l’IDE :
 
 image::java_the_switch_statement_does_not_cover_all_possible_input_values.png[alt="java: the switch statement does not cover all possible input values IntelliJ"]
 
 image::java_compile_error_java_17_the_switch_statement_does_not_cover_all_possible_input_values.png[alt="java compile error java 17 the switch statement does not cover all possible input values"]
 
-On doit alors déclarer le `Consumer<? extends Facture>` de tous les cas restants, ou bien les grouper dans un `default` :
+On doit alors déclarer le `Consumer<? extends Invoice>` de tous les cas restants, ou bien les grouper dans un `default` :
 
 [source%linenums,java,highlight=6..7]
 ----
-record FactureService(LettrageService lettrageService, RecouvrementService recouvrementService) implements TraitementFacture {
+record InvoiceService(LetterService letterService, RecoveryService recoveryService) implements InvoiceProcessing {
 
-	public void traiterFacture(Facture facture) {
-		switch (facture) {
-			case FacturePayée facturePayée -> lettrageService.lettrer(facturePayée);
-			// case FactureDue factureDue -> recouvrementService.relancer(factureDue);
+	public void traiterInvoice(Invoice invoice) {
+		switch (invoice) {
+			case PaidInvoice paidInvoice -> letterService.letter(paidInvoice);
+			// case DueInvoice dueInvoice -> recoveryService.relancer(dueInvoice);
 			default -> LOGGER.info("Cool y a rien à faire pour le cas là !");
 		}
 	}
@@ -368,82 +369,84 @@ Allez, ajoutons une feature preview de Java 17 : un "Guarded Pattern"
 
 [source%linenums,java,highlight=9..9]
 ----
-record FactureService(
-		LettrageService lettrageService,
-		RecouvrementService recouvrementService)
-		implements TraitementFacture {
+record InvoiceService(
+		LetterService letterService,
+		RecoveryService recoveryService)
+		implements InvoiceProcessing {
 
-	public void traiterFacture(Facture facture) {
-		switch (facture) {
-			case FacturePayée facturePayée -> lettrageService.lettrer(facturePayée);
-			case FactureDue factureDue && factureDue.aDéjàÉtéRelancée() -> recouvrementService.demarrerRecouvrement(factureDue);
-			case FactureDue factureDue -> recouvrementService.relancer(factureDue);
+	public void traiterInvoice(Invoice invoice) {
+		switch (invoice) {
+			case PaidInvoice paidInvoice -> letterService.letter(paidInvoice);
+			case DueInvoice dueInvoice && dueInvoice.aDéjàÉtéRelancée() -> recoveryService.demarrerRecovery(dueInvoice);
+			case DueInvoice dueInvoice -> recoveryService.relancer(dueInvoice);
 		}
 	}
 }
 ----
 
-Alors c'est très bien tout ça, mais l’objectif à terme du pattern matching va encore plus loin en ce qui concerne les records. +
+Un "Guarded Pattern" permet d'ajouter à notre pattern des conditions sur les valeurs de l'objet matché en plus de son type.
 
-Reprenons notre exemple de `Facture`, mais considérons qu'elle vient d'arriver d'un `Controlleur` sour forme de DTO (et donc de record) :
+Alors c’est très bien tout ça, mais l’objectif à terme du pattern matching va encore plus loin en ce qui concerne les records. +
+
+Reprenons notre exemple de `Invoice`, mais considérons qu’elle vient d’arriver d’un `Controlleur` sour forme de DTO (et donc de record) :
 
 [source,java]
 ----
-record Facture(String code, String libellé, Integer montant, ZonedDateTime dateCréation, ...){}
+record Invoice(String code, String libellé, Integer amount, ZonedDateTime dateCréation, ...){}
 ----
 
-Je ne lui donne que quelques champs, mais considérons en plus qu'il y a en une vingtaine, une centaine, beaucoup...
+Je ne lui donne que quelques champs, mais considérons en plus qu’il y a en une vingtaine, une centaine, beaucoup...
 
-Quand je veux mapper cette facture vers un usecase, alors ce dernier n'a très certainement besoin que de seulement quelques-uns de ces champs. Le code suivant serait donc une erreur de design :
+Quand je veux mapper cette invoice vers un usecase, alors ce dernier n’a très certainement besoin que de seulement quelques-uns de ces champs.
+Le code suivant serait donc une erreur de design :
 
 [source%linenums,java,highlight=8..8]
 ----
 @RestController
-class FactureControlleur {
+class InvoiceControlleur {
 
 	@PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Long create(@RequestBody Facture facture) {
-        Preconditions.checkNotNull(facture);
-        notifierNouvelleFactureUseCase.handle(facture);
-		return factureService.handle(facture)
-    }
+	@ResponseStatus(HttpStatus.CREATED)
+	public Long create(@RequestBody Invoice invoice) {
+		Preconditions.checkNotNull(invoice);
+		notifierNouvelleInvoiceUseCase.handle(invoice);
+		return invoiceService.handle(invoice)
+	}
 }
 ----
 
-On va pouvoir (Java >= 19) les déconstruire.
+Après Java 18 (Java 19 avec un peu de chance 🍀), on va pouvoir déconstruire des structures de données.
 
-/!\ On passe maintenant sur du code qu
-
-// todo : introduire un exemple qui justifie de décrire la d3construction
+// todo : introduire un exemple qui justifie de décrire la déconstruction
 
 == Qu’est-ce que la "déconstruction"
 
 Ce concept a un objectif similaire au I de SOLID : la ségrégation.
 
-Si je reçois un objet avec 42 champs alors que j’en ai besoin que de 2, la "_deconstruction on pattern_" va m’aider.
+Si je reçois un objet avec 43 champs alors que j’en ai besoin que de 2, la "_deconstruction on pattern_" va m’aider.
 
 Regardons ça avec du code.
 
-J’ai mon énorme dto reçu :
+J’ai mon énorme dto receipt :
 
 [source,java]
 ----
-public record Product(
-  String type,
-  String price,
-  String name,
-  // imaginez ici 39 autres champs
+record Invoice(
+	String code,
+	String libellé,
+	Integer amount,
+	ZonedDateTime dateCréation,
+	... // imaginez ici 39 autres champs
 ){}
 ----
 
-Mais la règle métier que je veux appliquer ne porte que sur le `type` et le `price`.
-Je peux alors étendre le concept de `instanceof` précédent, en lui ajoutant une déconstruction du Record "Product" :
+Mais la règle métier que je veux appliquer ne porte que sur le `code` et le `amount`.
+Je peux alors étendre le concept de `instanceof` précédent, en lui ajoutant une déconstruction du Record "Invoice" :
 
 [source,java]
 ----
-if (object instanceof Product(String type, String price)) {
-  myUseCase.execute(type, price);
+if (object instanceof Invoice(String code, Integer amount)) {
+	myUseCase.handle(code, amount);
 }
 ----
 
@@ -451,77 +454,28 @@ Ici, `type` et `price` sont des "binding variables" générées implicitement si
 
 === Et ça sert à quoi ?
 
-Tout seul comme ça, pas encore grand-chose.
+1. Découplage
+2. Expressivité
 
-//Cela répond à un besoin fondamental des développeurs : faire varier des comportements à la Runtime. Pour un type on veut le comportement A, et pour un autre on veut le comportement B.
-
-Pour le cas du `instanceof`, on gagne toutefois nettement en intelligibilité du code.
+Je ne compte pas expliquer ici en quoi ces 2 principes logiciels sont bénéfiques.
 
 Comparez plutôt avec la méthode habituelle :
 
 [source,java]
 ----
-if (vehicle instanceof Car) {
-  ((Car) vehicle).drive();
-} else if (vehicle instanceof Plane) {
-  ((Plane) vehicle).fly();
+if (object instanceof Invoice) {
+    Invoice invoice = ((Invoice) object);
+    String type = invoice.getType();
+    String price = invoice.getPrice();
+    myUseCase.handle(type, price);
 }
-----
-
-[source,java]
-----
-if (object instanceof Product) {
-  String type = ((Product) object).type;
-  String price = ((Product) object).price;
-  myUseCase.execute(type, price);
-}
-----
-
-Mais là où ça prend tout son intérêt, c’est quand on y ajoute le concept de classe scellée dans un "Switch on Pattern".
-
-Voyons cela.
-
-[source,java]
-----
-public sealed interface Document permits Invoice, Contract {}
-public record Invoice(int amount, String buyer, String Seller) implements Document {}
-public record Contract(List<String> parties, List<String> formalities, List<String> terms) implements Document {}
-----
-
-Ici, grâce au mécanisme de sceau (`sealed`), on indique au compilateur la liste exhaustive des implémentations de Document :
-
-* Invoice
-* Contract
-
-Les DTO `Invoice` et `Contract` sont reçu dans les modules Customer, Administrator et Partner (1 module = 1 context métier).
-
-Pour chaque implémentation, on veut effectuer des validations métiers différentes.
-
-La méthode habituelle de la programmation orientée object, c’est d’avoir une méthode `void validate()` dans l’interface Document, et de la faire implémenter par Invoice et Contract.
-
-Le problème avec ça, c’est que
-
-Mettons alors qu’on reçoive un DTO Document.
-
-Implémentons la sélection de la validation à appliquer à l’aide
-
-[source,java]
-----
-
-----
-
-Implémentons la sélection de la validation à appliquer à l’aide d’un "Switch on Pattern" :
-
-[source,java]
-----
-
 ----
 
 == Qu’est-ce que ça va apporter à notre code ?
 
 Plus de validation à la compile-time, et donc :
 
-* Plus de sécurité
+* Un boucle de feedback plus rapide
 * Développer plus intuitivement (le compilateur nous dis ce qu’on a oublié)
 * Faire émerger de meilleurs designs
 
@@ -532,8 +486,4 @@ Plus de validation à la compile-time, et donc :
 
 == Conclusion
 
-== brainstorm area
-
-* Pattern guards, Guarded Pattern
-* Sealed classes
-* Expressivité
+ // todo
