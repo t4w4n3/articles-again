@@ -33,7 +33,9 @@ C’est donc de ces features dont on parle ici :
 
 Et avec bien sûr des exemples de code !
 
-== Les applications de gestion aujourd’hui
+== Révolutionner Java, oui, mais pourquoi ?
+
+Quand on souhaite améliorer un produit, on commence par se demander où les efforts seraient les plus bénéfiques.
 
 Aujourd’hui le design de nos backend d’applications de gestions pousse (🌱) autour d’une problématique : +
 *Faire varier des comportements en fonction de cas d’usage*
@@ -50,7 +52,7 @@ Le `record` est la structure de données la plus appropriée. +
 Sinon, avant Java 14, on a les `@Value` de Lombok. +
 On peut aussi se contenter de POJO mutables.
 
-Dans nos applications modulaires, on peut avoir envie de partager ces structures de données entre les modules :
+Dans nos applications modulaires, on peut avoir envie de partager ces structures de données entre des modules :
 
 [plantuml,Modèle du domain Invoice,png]
 ----
@@ -62,13 +64,13 @@ node "Domain model" {
 }
 
 node "Module letter" {
-	usecase usecaseLetterPartiel
-	usecaseLetterPartiel - Invoice
+	usecase usecasePartialLettering
+	usecasePartialLettering - Invoice
 }
 
 node "Module recovery" {
-	usecase usecasePremiereRelance
-	usecasePremiereRelance - Invoice
+	usecase usecaseFirstReminder
+	usecaseFirstReminder - Invoice
 }
 
 @enduml
@@ -77,7 +79,7 @@ node "Module recovery" {
 Et bien pour faire varier les comportements des actions affectant ces classes, la POO nous incite à ajouter des méthodes sur nos classes de domaine. +
 //En effet, c’est un Objet, il a un état, et il peut porter des méthodes consommant ou modifiant cet état.
 
-Par exemple, pour la domain-class `Invoice`, le module letter pourrait vouloir ajouter une méthode `calculateRemainingAmountToPay()`. +
+Par exemple, pour la domain-class `Invoice`, le module `Letter` pourrait vouloir ajouter une méthode `calculateRemainingAmountToPay()`. +
 Le module envoie pourrait vouloir une méthode `getRecipients()`.
 
 [plantuml,Modèle de domaine avec Invoice et cas d’utilisation,png]
@@ -88,13 +90,13 @@ allow_mixing
 node "Domain model" {
 
 
-	class Invoice implements AmountCalculable, Envoyable {
+	class Invoice implements CalculableAmount, Sendable {
 	Integer calculateRemainingAmountToPay()
-	List<Personne> getRecipients()
+	List<Person> getRecipients()
   }
 
-  interface AmountCalculable
-  interface Envoyable
+  interface CalculableAmount
+  interface Sendable
 }
 
 node "Module letter" {
@@ -103,8 +105,8 @@ node "Module letter" {
 }
 
 node "Module envoi" {
-  usecase usecasePremiereRelance
-  usecasePremiereRelance - Invoice
+  usecase usecaseFirstReminder
+  usecaseFirstReminder - Invoice
 }
 
 @enduml
@@ -112,8 +114,8 @@ node "Module envoi" {
 
 [source,java]
 ----
-class Invoice implements AmountCalculable, Envoyable {
-	private String libelle;
+class Invoice implements CalculableAmount, Sendable {
+	private String label;
 	private CodeInvoice code;
 	private Client client;
 	private Receipt receipt;
@@ -125,7 +127,7 @@ class Invoice implements AmountCalculable, Envoyable {
 	}
 
 	@Override
-	public List<Personne> getRecipients(){
+	public List<Person> getRecipients(){
 		...
 	}
 
@@ -134,20 +136,20 @@ class Invoice implements AmountCalculable, Envoyable {
 ----
 
 Au bout d’un moment, notre domain-class `Invoice` a beaucoup de méthodes issues de différents modules. +
-Le module letter utilise `Invoice` et se retrouve à pouvoir appeler les méthodes du module d’envoi ; ce qui viole au moins :
+Le module `Letter` utilise `Invoice` et se retrouve à pouvoir appeler les méthodes du module `Send` ; ce qui viole au moins :
 
 * Le https://fr.wikipedia.org/wiki/Principe_de_s%C3%A9gr%C3%A9gation_des_interfaces[principe de ségrégation des interfaces]
-* Le https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique[principe de responsabilité unique] (Car la classe Document a maintenant 2 raisons de changer : le contexte _letter_ et le contexte _envoi_)
+* Le https://fr.wikipedia.org/wiki/Principe_de_responsabilit%C3%A9_unique[principe de responsabilité unique] (Car la classe Document a maintenant 2 raisons de changer : le contexte `Letter` et le contexte `Send`)
 
-Effet bonus : Quand on change `Invoice` dans le cadre du contexte _letter_, on doit recompiler/relivrer aussi le contexte _envoi_.
+Effet bonus : Quand on change `Invoice` dans le cadre du contexte `Letter`, on doit recompiler/relivrer aussi le contexte `Send`.
 
 === Solution : séparer la logique métier des structures sur lesquelles elle agit
 
-Pour y parvenir, on utilisait jusque-là 3 patterns :
+Pour y parvenir, on utilisait jusque-là au moins ces 3 patterns :
 
 * Le https://en.wikipedia.org/wiki/Visitor_pattern#Sources_3[visitor pattern]footnote:["Today, to express ad-hoc polymorphic calculations like this we would use the cumbersome visitor pattern". source : https://openjdk.java.net/jeps/405]
 * Le https://en.wikipedia.org/wiki/Delegation_pattern[delegate pattern]
-* Le pattern service-everywhere avec des méthodes à 8 arguments (un anti-pattern d’après moi), qui nait de la programmation procédurale
+* Le pattern service-everywhere avec des méthodes à 8 arguments (un anti-pattern d’après moi), qui nait de la programmation procédurale dans un monde d'https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans[inversion de contrôle.]
 
 Mais à présent avec Java 17, une quatrième solution élégante s’offre à nous : Le Pattern Matching.
 
@@ -179,7 +181,7 @@ if (invoice instanceof PaidInvoice) { // Oui je mets des accents dans mon code f
 	return;
 }
 if (invoice instanceof DueInvoice) {
-	recoveryService.relancer(((DueInvoice) invoice));
+	recoveryService.remind(((DueInvoice) invoice));
 }
 ----
 
@@ -192,7 +194,7 @@ if (invoice instanceof PaidInvoice paidInvoice) {
 	return;
 }
 if (invoice instanceof DueInvoice dueInvoice) {
-	recoveryService.relancer(dueInvoice);
+	recoveryService.remind(dueInvoice);
 }
 ----
 
@@ -223,7 +225,7 @@ class PaidInvoice extends Invoice {
 class DueInvoice extends Invoice {
 	private Integer reminderNumber = 0;
 
-	public void incrementerNombreRelance(){
+	public void incrementReminderNumber(){
 		reminderNumber++;
 	}
 
@@ -243,7 +245,7 @@ interface LetterService {
 }
 
 interface RecoveryService {
-	void relancer(DueInvoice dueInvoice);
+	void remind(DueInvoice dueInvoice);
 }
 
 record MainInvoiceVisitor(LetterService letterService, RecoveryService recoveryService) implements InvoiceVisitor {
@@ -255,20 +257,20 @@ record MainInvoiceVisitor(LetterService letterService, RecoveryService recoveryS
 
 	@Override
 	public void visit(DueInvoice dueInvoice) {
-		recoveryService.relancer(dueInvoice);
+		recoveryService.remind(dueInvoice);
 	}
 }
 
 record InvoiceService(MainInvoiceVisitor mainInvoiceVisitor) implements InvoiceProcessing {
 
-	public void traiterInvoice(Invoice invoice) {
+	public void handleInvoice(Invoice invoice) {
 		invoice.accept(mainInvoiceVisitor);
 	}
 }
 
 ----
 
-On observe que le rapport code utile/https://en.wikipedia.org/wiki/Boilerplate_code[boilerplate] n’est pas excellent.
+On observe que le rapport code utile / https://en.wikipedia.org/wiki/Boilerplate_code[boilerplate] n’est pas excellent.
 
 Et maintenant :
 
@@ -276,13 +278,13 @@ Et maintenant :
 ----
 record InvoiceService(LetterService letterService, RecoveryService recoveryService) implements InvoiceProcessing {
 
-	public void traiterInvoice(Invoice invoice) {
+	public void handleInvoice(Invoice invoice) {
 		if (invoice instanceof PaidInvoice paidInvoice) {
 			letterService.letter(paidInvoice);
 			return;
 		}
 		if (invoice instanceof DueInvoice dueInvoice) {
-			recoveryService.relancer(dueInvoice);
+			recoveryService.remind(dueInvoice);
 		}
 	}
 }
@@ -309,7 +311,7 @@ final class PaidInvoice extends Invoice {
 final class DueInvoice extends Invoice {
 	private Integer reminderNumber = 0;
 
-	public void incrementerNombreRelance(){
+	public void incrementerNombreReminder(){
 		reminderNumber++;
 	}
 
@@ -330,10 +332,10 @@ Cela donne donc :
 ----
 record InvoiceService(LetterService letterService, RecoveryService recoveryService) implements InvoiceProcessing {
 
-	public void traiterInvoice(Invoice invoice) {
+	public void handleInvoice(Invoice invoice) {
 		switch (invoice) {
 			case PaidInvoice paidInvoice -> letterService.letter(paidInvoice);
-			// case DueInvoice dueInvoice -> recoveryService.relancer(dueInvoice);
+			// case DueInvoice dueInvoice -> recoveryService.remind(dueInvoice);
 		}
 	}
 }
@@ -351,17 +353,17 @@ On doit alors déclarer le `Consumer<? extends Invoice>` de tous les cas restant
 ----
 record InvoiceService(LetterService letterService, RecoveryService recoveryService) implements InvoiceProcessing {
 
-	public void traiterInvoice(Invoice invoice) {
+	public void handleInvoice(Invoice invoice) {
 		switch (invoice) {
 			case PaidInvoice paidInvoice -> letterService.letter(paidInvoice);
-			// case DueInvoice dueInvoice -> recoveryService.relancer(dueInvoice);
+			// case DueInvoice dueInvoice -> recoveryService.remind(dueInvoice);
 			default -> LOGGER.info("Cool y a rien à faire pour le cas là !");
 		}
 	}
 }
 ----
 
-Avec cette syntaxe, le langage nous apporte une validation métier de plus à la compile time (soit plus tôt qu’à la runtime ou encore à la _prodtime_). +
+Avec cette syntaxe, le langage nous apporte une validation métier de plus à la compile time (soit plus tôt qu’à la runtime. Tout ce qui réduit la boucle de feedback est bénéfique). +
 C’est les TDDistes qui sont contents.
 
 Et si on allait encore plus loin ? +
@@ -374,17 +376,17 @@ record InvoiceService(
 		RecoveryService recoveryService)
 		implements InvoiceProcessing {
 
-	public void traiterInvoice(Invoice invoice) {
+	public void handleInvoice(Invoice invoice) {
 		switch (invoice) {
 			case PaidInvoice paidInvoice -> letterService.letter(paidInvoice);
-			case DueInvoice dueInvoice && dueInvoice.aDéjàÉtéRelancée() -> recoveryService.demarrerRecovery(dueInvoice);
-			case DueInvoice dueInvoice -> recoveryService.relancer(dueInvoice);
+			case DueInvoice dueInvoice && dueInvoice.hasAlreadyBeenReminded() -> recoveryService.startRecovery(dueInvoice);
+			case DueInvoice dueInvoice -> recoveryService.remind(dueInvoice);
 		}
 	}
 }
 ----
 
-Un "Guarded Pattern" permet d'ajouter à notre pattern des conditions sur les valeurs de l'objet matché en plus de son type.
+Un "Guarded Pattern" permet d’ajouter à notre pattern des conditions sur les valeurs de l’objet matché en plus de son type.
 
 Alors c’est très bien tout ça, mais l’objectif à terme du pattern matching va encore plus loin en ce qui concerne les records. +
 
@@ -392,7 +394,7 @@ Reprenons notre exemple de `Invoice`, mais considérons qu’elle vient d’arri
 
 [source,java]
 ----
-record Invoice(String code, String libellé, Integer amount, ZonedDateTime dateCréation, ...){}
+record Invoice(String code, String label, Integer amount, ZonedDateTime creationDate, ...){}
 ----
 
 Je ne lui donne que quelques champs, mais considérons en plus qu’il y a en une vingtaine, une centaine, beaucoup...
@@ -409,7 +411,7 @@ class InvoiceControlleur {
 	@ResponseStatus(HttpStatus.CREATED)
 	public Long create(@RequestBody Invoice invoice) {
 		Preconditions.checkNotNull(invoice);
-		notifierNouvelleInvoiceUseCase.handle(invoice);
+		notifyNewInvoiceUseCase.handle(invoice);
 		return invoiceService.handle(invoice)
 	}
 }
@@ -471,11 +473,9 @@ if (object instanceof Invoice) {
 }
 ----
 
-== Qu’est-ce que ça va apporter à notre code ?
+== Qu'apporte à notre code ces nouvelles fonctionnalités ?
 
-Plus de validation à la compile-time, et donc :
-
-* Un boucle de feedback plus rapide
+* Plus de validation à la compile-time, et donc une boucle de feedback plus rapide.
 * Développer plus intuitivement (le compilateur nous dis ce qu’on a oublié)
 * Faire émerger de meilleurs designs
 
@@ -486,4 +486,4 @@ Plus de validation à la compile-time, et donc :
 
 == Conclusion
 
- // todo
+
