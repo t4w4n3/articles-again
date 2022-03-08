@@ -35,7 +35,8 @@ Et avec bien sûr des exemples de code !
 
 == Révolutionner Java, oui, mais pourquoi ?
 
-Quand on souhaite améliorer un produit, on commence par se demander où les efforts seraient les plus bénéfiques.
+Quand on souhaite améliorer un produit, on commence par se demander où les efforts seraient les plus bénéfiques. +
+Si on veut améliorer Java, on doit alors se demander "Que fait-on le plus souvent en Java, qui mériterait un upgrade ?"
 
 Aujourd’hui le design de nos backend d’applications de gestions pousse (🌱) autour d’une problématique : +
 *Faire varier des comportements en fonction de cas d’usage*
@@ -80,7 +81,7 @@ Et bien pour faire varier les comportements des actions affectant ces classes, l
 //En effet, c’est un Objet, il a un état, et il peut porter des méthodes consommant ou modifiant cet état.
 
 Par exemple, pour la domain-class `Invoice`, le module `Letter` pourrait vouloir ajouter une méthode `calculateRemainingAmountToPay()`. +
-Le module envoie pourrait vouloir une méthode `getRecipients()`.
+Le module `Send` pourrait vouloir une méthode `getRecipients()`.
 
 [plantuml,Modèle de domaine avec Invoice et cas d’utilisation,png]
 ----
@@ -104,7 +105,7 @@ node "Module letter" {
   usecaseLetterPartiel - Invoice
 }
 
-node "Module envoi" {
+node "Module send" {
   usecase usecaseFirstReminder
   usecaseFirstReminder - Invoice
 }
@@ -176,7 +177,7 @@ Avant Java 17, on avait ça :
 
 [source,java]
 ----
-if (invoice instanceof PaidInvoice) { // Oui je mets des accents dans mon code français. La sémantique !
+if (invoice instanceof PaidInvoice) {
 	letterService.letter(((PaidInvoice) invoice));
 	return;
 }
@@ -473,6 +474,10 @@ if (object instanceof Invoice) {
 }
 ----
 
+== La déconstruction d'array
+
+== L'imbrication de pattern
+
 == Qu'apporte à notre code ces nouvelles fonctionnalités ?
 
 * Plus de validation à la compile-time, et donc une boucle de feedback plus rapide.
@@ -484,6 +489,13 @@ if (object instanceof Invoice) {
 * https://docs.scala-lang.org/tour/pattern-matching.html[Scala]
 * https://doc.rust-lang.org/rust-by-example/flow_control/match.html[Rust]
 
+== Eh oh, et Java 18 alors ?
+
+À l'écriture de ces lignes, Java 18 est en phase de release candidate. +
+Cela signifie que la listes de ces features est fixée. +
+En ce qui concerne le pattern matching, on y retrouve la JEP 420 : Pattern Matching for switch (Second Preview) +
+Cette seconde preview apporte des corrections de syntaxe et de compilation mineures, qui n'affecte pas les explications précédentes.
+
 == Conclusion
 
-
+Plus que comment utiliser les fonctionnalités gravitant autour du pattern matching, je me suis concentré ici sur le quand et le pourquoi.
